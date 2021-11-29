@@ -1,0 +1,7 @@
+WITH Candidates_orders_lineitem AS (
+        SELECT DISTINCT orders.o_orderkey, lineitem.l_orderkey, lineitem.l_linenumber, customer.c_custkey, customer.c_name, customer.c_accbal, nation.n_name, customer.c_address, customer.c_phone, customer.c_comment FROM orders, customer, nation, lineitem WHERE lineitem.l_orderkey = orders.o_orderkey AND orders.o_custkey = customer.c_custkey AND customer.c_nationkey = nation.n_nationkey AND lineitem.l_returnflag = 590239
+), 
+        Filter_orders_lineitem AS (
+                SELECT C.o_orderkey, C.l_orderkey, C.l_linenumber FROM Candidates_orders_lineitem C JOIN orders ON C.o_orderkey = orders.o_orderkey JOIN lineitem ON C.l_orderkey = lineitem.l_orderkey AND C.l_linenumber = lineitem.l_linenumber LEFT OUTER JOIN customer ON orders.o_custkey = customer.c_custkey LEFT OUTER JOIN nation ON customer.c_nationkey = nation.n_nationkey WHERE lineitem.l_orderkey = orders.o_orderkey AND (customer.c_custkey IS NULL OR nation.n_nationkey IS NULL OR lineitem.l_returnflag != 590239) UNION ALL SELECT C.o_orderkey, C.l_orderkey, C.l_linenumber FROM Candidates_orders_lineitem C GROUP BY C.o_orderkey, C.l_orderkey, C.l_linenumber HAVING COUNT(*) > 1
+)
+        SELECT DISTINCT c_custkey, c_name, c_accbal, n_name, c_address, c_phone, c_comment FROM Candidates_orders_lineitem C WHERE NOT EXISTS (SELECT * FROM Filter_orders_lineitem F WHERE C.o_orderkey = F.o_orderkey AND C.l_orderkey = F.l_orderkey AND C.l_linenumber = F.l_linenumber)

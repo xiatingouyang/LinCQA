@@ -1,0 +1,46 @@
+EDB_DECL:
+part(a0 int, a1 int, a2 int, a3 int, a4 int, a5 int, a6 int, a7 int, a8 int)
+supplier(a0 int, a1 int, a2 int, a3 int, a4 int, a5 int, a6 int)
+partsupp(a0 int, a1 int, a2 int, a3 int, a4 int)
+nation(a0 int, a1 int, a2 int, a3 int)
+region(a0 int, a1 int, a2 int)
+
+
+IDB_DECL:
+ground(a0 int, a1 int, a2 int, a3 int, a4 int, a5 int, a6 int, a7 int, a8 int, a9 int, a10 int)
+part_bad_key(a0 int, a1 int, a2 int, a3 int, a4 int, a5 int, a6 int, a7 int)
+partsupp_good_join(a0 int, a1 int, a2 int, a3 int, a4 int, a5 int, a6 int)
+part_good_join(a0 int, a1 int, a2 int, a3 int, a4 int, a5 int, a6 int)
+partsupp_bad_key(a0 int, a1 int, a2 int, a3 int, a4 int, a5 int, a6 int, a7 int)
+supplier_good_join(a0 int, a1 int, a2 int, a3 int, a4 int, a5 int, a6 int)
+supplier_bad_key(a0 int, a1 int, a2 int, a3 int, a4 int, a5 int, a6 int)
+nation_good_join(a0 int, a1 int)
+nation_bad_key(a0 int, a1 int)
+region_good_join(a0 int)
+region_bad_key(a0 int)
+return(a0 int, a1 int, a2 int, a3 int, a4 int, a5 int, a6 int, a7 int)
+
+
+RULE_DECL:
+
+
+ground(PS_PARTKEY, P_MFGR, PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NATIONKEY, N_NAME, R_REGIONKEY) :- part(PS_PARTKEY, P_NAME, P_MFGR, P_BRAND, P_TYPE, 15, P_CONTAINER, P_RETAILPRICE, P_COMMENT), supplier(PS_SUPPKEY, S_NAME, S_ADDRESS, N_NATIONKEY, S_PHONE, S_ACCTBAL, S_COMMENT), partsupp(PS_PARTKEY, PS_SUPPKEY, PS_AVAILQTY, PS_SUPPLYCOST, PS_COMMENT), nation(N_NATIONKEY, N_NAME, R_REGIONKEY, N_COMMENT), region(R_REGIONKEY, 3250192, R_COMMENT).
+part_bad_key(PS_PARTKEY, P_MFGR, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME) :- part(PS_PARTKEY, P_NAME, FREE_0, P_BRAND, P_TYPE, FREE_1, P_CONTAINER, P_RETAILPRICE, P_COMMENT), P_MFGR != FREE_0, ground(PS_PARTKEY, P_MFGR, _, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, _, N_NAME, _).
+part_bad_key(PS_PARTKEY, P_MFGR, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME) :- part(PS_PARTKEY, P_NAME, FREE_0, P_BRAND, P_TYPE, FREE_1, P_CONTAINER, P_RETAILPRICE, P_COMMENT), 15 != FREE_1, ground(PS_PARTKEY, P_MFGR, _, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, _, N_NAME, _).
+part_bad_key(PS_PARTKEY, P_MFGR, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME) :- part(PS_PARTKEY, P_NAME, P_MFGR, P_BRAND, P_TYPE, 15, P_CONTAINER, P_RETAILPRICE, P_COMMENT), ! partsupp_good_join(PS_PARTKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME), ground(PS_PARTKEY, P_MFGR, _, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, _, N_NAME, _).
+part_good_join(P_MFGR, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME) :- part(PS_PARTKEY, P_NAME, P_MFGR, P_BRAND, P_TYPE, 15, P_CONTAINER, P_RETAILPRICE, P_COMMENT), ! part_bad_key(PS_PARTKEY, P_MFGR, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME), partsupp_good_join(PS_PARTKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME), ground(PS_PARTKEY, P_MFGR, _, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, _, N_NAME, _).
+partsupp_bad_key(PS_PARTKEY, PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME) :- partsupp(PS_PARTKEY, PS_SUPPKEY, PS_AVAILQTY, PS_SUPPLYCOST, PS_COMMENT), ! supplier_good_join(PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME), ground(PS_PARTKEY, _, PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, _, N_NAME, _).
+partsupp_good_join(PS_PARTKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME) :- partsupp(PS_PARTKEY, PS_SUPPKEY, PS_AVAILQTY, PS_SUPPLYCOST, PS_COMMENT), ! partsupp_bad_key(PS_PARTKEY, PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME), supplier_good_join(PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME), ground(PS_PARTKEY, _, PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, _, N_NAME, _).
+supplier_bad_key(PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME) :- supplier(PS_SUPPKEY, FREE_0, FREE_1, N_NATIONKEY, FREE_2, FREE_3, FREE_4), S_NAME != FREE_0, ground(_, _, PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, _, N_NAME, _).
+supplier_bad_key(PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME) :- supplier(PS_SUPPKEY, FREE_0, FREE_1, N_NATIONKEY, FREE_2, FREE_3, FREE_4), S_ADDRESS != FREE_1, ground(_, _, PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, _, N_NAME, _).
+supplier_bad_key(PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME) :- supplier(PS_SUPPKEY, FREE_0, FREE_1, N_NATIONKEY, FREE_2, FREE_3, FREE_4), S_PHONE != FREE_2, ground(_, _, PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, _, N_NAME, _).
+supplier_bad_key(PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME) :- supplier(PS_SUPPKEY, FREE_0, FREE_1, N_NATIONKEY, FREE_2, FREE_3, FREE_4), S_ACCTBAL != FREE_3, ground(_, _, PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, _, N_NAME, _).
+supplier_bad_key(PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME) :- supplier(PS_SUPPKEY, FREE_0, FREE_1, N_NATIONKEY, FREE_2, FREE_3, FREE_4), S_COMMENT != FREE_4, ground(_, _, PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, _, N_NAME, _).
+supplier_bad_key(PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME) :- supplier(PS_SUPPKEY, S_NAME, S_ADDRESS, N_NATIONKEY, S_PHONE, S_ACCTBAL, S_COMMENT), ! nation_good_join(N_NATIONKEY, N_NAME), ground(_, _, PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, _, N_NAME, _).
+supplier_good_join(PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME) :- supplier(PS_SUPPKEY, S_NAME, S_ADDRESS, N_NATIONKEY, S_PHONE, S_ACCTBAL, S_COMMENT), ! supplier_bad_key(PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME), nation_good_join(N_NATIONKEY, N_NAME), ground(_, _, PS_SUPPKEY, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, _, N_NAME, _).
+nation_bad_key(N_NATIONKEY, N_NAME) :- nation(N_NATIONKEY, FREE_0, R_REGIONKEY, N_COMMENT), N_NAME != FREE_0, ground(_, _, _, _, _, _, _, _, N_NATIONKEY, N_NAME, _).
+nation_bad_key(N_NATIONKEY, N_NAME) :- nation(N_NATIONKEY, N_NAME, R_REGIONKEY, N_COMMENT), ! region_good_join(R_REGIONKEY), ground(_, _, _, _, _, _, _, _, N_NATIONKEY, N_NAME, _).
+nation_good_join(N_NATIONKEY, N_NAME) :- nation(N_NATIONKEY, N_NAME, R_REGIONKEY, N_COMMENT), ! nation_bad_key(N_NATIONKEY, N_NAME), region_good_join(R_REGIONKEY), ground(_, _, _, _, _, _, _, _, N_NATIONKEY, N_NAME, _).
+region_bad_key(R_REGIONKEY) :- region(R_REGIONKEY, FREE_0, R_COMMENT), 3250192 != FREE_0, ground(_, _, _, _, _, _, _, _, _, _, R_REGIONKEY).
+region_good_join(R_REGIONKEY) :- region(R_REGIONKEY, 3250192, R_COMMENT), ! region_bad_key(R_REGIONKEY), ground(_, _, _, _, _, _, _, _, _, _, R_REGIONKEY).
+return(S_ACCTBAL, S_NAME, N_NAME, P_PARTKEY, P_MFGR, S_ADDRESS, S_PHONE, S_COMMENT) :- part_good_join(P_MFGR, S_NAME, S_ADDRESS, S_PHONE, S_ACCTBAL, S_COMMENT, N_NAME).

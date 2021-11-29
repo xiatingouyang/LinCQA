@@ -1,0 +1,29 @@
+EDB_DECL:
+r_5(a0 int, a1 int, a2 int)
+r_6(a0 int, a1 int, a2 int)
+r_9(a0 int, a1 int, a2 int)
+
+
+IDB_DECL:
+ground(a0 int, a1 int, a2 int)
+r_6_bad_key(a0 int, a1 int)
+r_5_good_join(a0 int, a1 int)
+r_6_good_join(a0 int)
+r_5_bad_key(a0 int, a1 int)
+r_9_good_join(a0 int, a1 int)
+r_9_bad_key(a0 int)
+return(a0 int)
+
+
+RULE_DECL:
+
+
+ground(A91, A53, A61) :- r_5(A91, A92, A53), r_6(A61, A92, A63), r_9(A91, A92, A93).
+r_6_bad_key(A61, A53) :- r_6(A61, A92, A63), ! r_5_good_join(A92, A53), ground(_, A53, A61).
+r_6_good_join(A53) :- r_6(A61, A92, A63), ! r_6_bad_key(A61, A53), r_5_good_join(A92, A53), ground(_, A53, A61).
+r_5_bad_key(A91, A53) :- r_5(A91, A92, FREE_0), A53 != FREE_0, ground(A91, A53, _).
+r_5_bad_key(A91, A53) :- r_5(A91, A92, A53), ! r_9_good_join(A91, A92), ground(A91, A53, _).
+r_5_good_join(A92, A53) :- r_5(A91, A92, A53), ! r_5_bad_key(A91, A53), r_9_good_join(A91, A92), ground(A91, A53, _).
+r_9_bad_key(A91) :- r_9(A91, A92, A93), r_9(A91, FREE_0, FREE_1), A92 != FREE_0, ground(A91, A53, _).
+r_9_good_join(A91, A92) :- r_9(A91, A92, A93), ! r_9_bad_key(A91), ground(A91, _, _).
+return(A53) :- r_6_good_join(A53).

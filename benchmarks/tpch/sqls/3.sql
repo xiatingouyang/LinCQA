@@ -1,0 +1,1 @@
+select distinct lineitem.l_orderkey, orders.o_orderdate, orders.o_shippriority from customer, orders, lineitem where customer.c_mktsegment = 4 and customer.c_custkey = orders.o_custkey and lineitem.l_orderkey = orders.o_orderkey

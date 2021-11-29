@@ -1,0 +1,1 @@
+select distinct supplier.s_name from supplier, lineitem, orders, nation where supplier.s_suppkey = lineitem.l_suppkey and orders.o_orderkey = lineitem.l_orderkey and orders.o_orderstatus = 590240 and supplier.s_nationkey = nation.n_nationkey and nation.n_name = 3164286

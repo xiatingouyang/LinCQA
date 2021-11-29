@@ -1,0 +1,1 @@
+select distinct customer.c_custkey, customer.c_name, customer.c_accbal, nation.n_name, customer.c_address, customer.c_phone, customer.c_comment from customer, orders, lineitem, nation where customer.c_custkey = orders.o_custkey and lineitem.l_orderkey = orders.o_orderkey and lineitem.l_returnflag = 590239 and customer.c_nationkey = nation.n_nationkey

@@ -1,0 +1,35 @@
+EDB_DECL:
+supplier(a0 int, a1 int, a2 int, a3 int, a4 int, a5 int, a6 int)
+lineitem(a0 int, a1 int, a2 int, a3 int, a4 int, a5 int, a6 int, a7 int, a8 int, a9 int, a10 int, a11 int, a12 int, a13 int, a14 int, a15 int)
+orders(a0 int, a1 int, a2 int, a3 int, a4 int, a5 int, a6 int, a7 int, a8 int)
+nation(a0 int, a1 int, a2 int, a3 int)
+
+
+IDB_DECL:
+ground(a0 int, a1 int, a2 int, a3 int, a4 int)
+lineitem_bad_key(a0 int, a1 int, a2 int)
+orders_good_join(a0 int)
+supplier_good_join(a0 int, a1 int)
+lineitem_good_join(a0 int)
+orders_bad_key(a0 int)
+supplier_bad_key(a0 int, a1 int)
+nation_good_join(a0 int)
+nation_bad_key(a0 int)
+return(a0 int)
+
+
+RULE_DECL:
+
+
+ground(L_SUPPKEY, S_NAME, L_ORDERKEY, L_LINENUMBER, N_NATIONKEY) :- supplier(L_SUPPKEY, S_NAME, S_ADDRESS, N_NATIONKEY, S_PHONE, S_ACCTBAL, S_COMMENT), lineitem(L_ORDERKEY, L_PARTKEY, L_SUPPKEY, L_LINENUMBER, L_QUANTITY, L_EXTENDEDPRICE, L_DISCOUNT, L_TAX, L_RETURNFLAG, L_LINESTATUS, L_SHIPDATE, L_COMMITDATE, L_RECEIPTDATE, L_SHIPINSTRUCT, L_SHIPMODE, L_COMMENT), orders(L_ORDERKEY, O_CUSTKEY, 590240, O_TOTALPRICE, O_ORDERDATE, O_ORDERPRIORITY, O_CLERK, O_SHIPPRIORITY, O_COMMENT), nation(N_NATIONKEY, 3164286, N_REGIONKEY, N_COMMENT).
+lineitem_bad_key(L_ORDERKEY, L_LINENUMBER, S_NAME) :- lineitem(L_ORDERKEY, L_PARTKEY, L_SUPPKEY, L_LINENUMBER, L_QUANTITY, L_EXTENDEDPRICE, L_DISCOUNT, L_TAX, L_RETURNFLAG, L_LINESTATUS, L_SHIPDATE, L_COMMITDATE, L_RECEIPTDATE, L_SHIPINSTRUCT, L_SHIPMODE, L_COMMENT), ! orders_good_join(L_ORDERKEY), ground(_, S_NAME, L_ORDERKEY, L_LINENUMBER, _).
+lineitem_bad_key(L_ORDERKEY, L_LINENUMBER, S_NAME) :- lineitem(L_ORDERKEY, L_PARTKEY, L_SUPPKEY, L_LINENUMBER, L_QUANTITY, L_EXTENDEDPRICE, L_DISCOUNT, L_TAX, L_RETURNFLAG, L_LINESTATUS, L_SHIPDATE, L_COMMITDATE, L_RECEIPTDATE, L_SHIPINSTRUCT, L_SHIPMODE, L_COMMENT), ! supplier_good_join(L_SUPPKEY, S_NAME), ground(_, S_NAME, L_ORDERKEY, L_LINENUMBER, _).
+lineitem_good_join(S_NAME) :- lineitem(L_ORDERKEY, L_PARTKEY, L_SUPPKEY, L_LINENUMBER, L_QUANTITY, L_EXTENDEDPRICE, L_DISCOUNT, L_TAX, L_RETURNFLAG, L_LINESTATUS, L_SHIPDATE, L_COMMITDATE, L_RECEIPTDATE, L_SHIPINSTRUCT, L_SHIPMODE, L_COMMENT), ! lineitem_bad_key(L_ORDERKEY, L_LINENUMBER, S_NAME), orders_good_join(L_ORDERKEY), supplier_good_join(L_SUPPKEY, S_NAME), ground(_, S_NAME, L_ORDERKEY, L_LINENUMBER, _).
+orders_bad_key(L_ORDERKEY) :- orders(L_ORDERKEY, O_CUSTKEY, FREE_0, O_TOTALPRICE, O_ORDERDATE, O_ORDERPRIORITY, O_CLERK, O_SHIPPRIORITY, O_COMMENT), 590240 != FREE_0, ground(_, _, L_ORDERKEY, _, _).
+orders_good_join(L_ORDERKEY) :- orders(L_ORDERKEY, O_CUSTKEY, 590240, O_TOTALPRICE, O_ORDERDATE, O_ORDERPRIORITY, O_CLERK, O_SHIPPRIORITY, O_COMMENT), ! orders_bad_key(L_ORDERKEY), ground(_, _, L_ORDERKEY, _, _).
+supplier_bad_key(L_SUPPKEY, S_NAME) :- supplier(L_SUPPKEY, FREE_0, S_ADDRESS, N_NATIONKEY, S_PHONE, S_ACCTBAL, S_COMMENT), S_NAME != FREE_0, ground(L_SUPPKEY, S_NAME, _, _, _).
+supplier_bad_key(L_SUPPKEY, S_NAME) :- supplier(L_SUPPKEY, S_NAME, S_ADDRESS, N_NATIONKEY, S_PHONE, S_ACCTBAL, S_COMMENT), ! nation_good_join(N_NATIONKEY), ground(L_SUPPKEY, S_NAME, _, _, _).
+supplier_good_join(L_SUPPKEY, S_NAME) :- supplier(L_SUPPKEY, S_NAME, S_ADDRESS, N_NATIONKEY, S_PHONE, S_ACCTBAL, S_COMMENT), ! supplier_bad_key(L_SUPPKEY, S_NAME), nation_good_join(N_NATIONKEY), ground(L_SUPPKEY, S_NAME, _, _, _).
+nation_bad_key(N_NATIONKEY) :- nation(N_NATIONKEY, FREE_0, N_REGIONKEY, N_COMMENT), 3164286 != FREE_0, ground(_, _, _, _, N_NATIONKEY).
+nation_good_join(N_NATIONKEY) :- nation(N_NATIONKEY, 3164286, N_REGIONKEY, N_COMMENT), ! nation_bad_key(N_NATIONKEY), ground(_, _, _, _, N_NATIONKEY).
+return(S_NAME) :- lineitem_good_join(S_NAME).

@@ -1,0 +1,1 @@
+select distinct customer.c_name, customer.c_custkey, orders.o_orderkey, orders.o_orderdate, orders.o_totalprice from customer, orders, lineitem where customer.c_custkey = orders.o_custkey and orders.o_orderkey = lineitem.l_orderkey

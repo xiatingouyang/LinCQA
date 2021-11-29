@@ -1,0 +1,29 @@
+EDB_DECL:
+r_3(a0 int, a1 int, a2 int)
+r_4(a0 int, a1 int, a2 int)
+r_10(a0 int, a1 int, a2 int)
+
+
+IDB_DECL:
+ground(a0 int, a1 int, a2 int)
+r_4_bad_key(a0 int, a1 int)
+r_3_good_join(a0 int, a1 int, a2 int)
+r_4_good_join(a0 int)
+r_3_bad_key(a0 int, a1 int)
+r_10_good_join(a0 int, a1 int)
+r_10_bad_key(a0 int)
+return(a0 int)
+
+
+RULE_DECL:
+
+
+ground(A42, A33, A102) :- r_3(A42, A102, A33), r_4(A102, A42, A43), r_10(A42, A102, A103).
+r_4_bad_key(A102, A33) :- r_4(A102, A42, A43), ! r_3_good_join(A102, A42, A33), ground(_, A33, A102).
+r_4_good_join(A33) :- r_4(A102, A42, A43), ! r_4_bad_key(A102, A33), r_3_good_join(A102, A42, A33), ground(_, A33, A102).
+r_3_bad_key(A42, A33) :- r_3(A42, A102, FREE_0), A33 != FREE_0, ground(A42, A33, _).
+r_3_bad_key(A42, A33) :- r_3(A42, A102, A33), ! r_10_good_join(A42, A102), ground(A42, A33, _).
+r_3_good_join(A102, A42, A33) :- r_3(A42, A102, A33), ! r_3_bad_key(A42, A33), r_10_good_join(A42, A102), ground(A42, A33, _).
+r_10_bad_key(A42) :- r_10(A42, A102, A103), r_10(A42, FREE_0, FREE_1), A102 != FREE_0, ground(A42, A33, _).
+r_10_good_join(A42, A102) :- r_10(A42, A102, A103), ! r_10_bad_key(A42), ground(A42, _, _).
+return(A33) :- r_4_good_join(A33).
