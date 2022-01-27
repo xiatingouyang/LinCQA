@@ -10,7 +10,7 @@ apt install default-jre
 
 wget http://pages.cs.wisc.edu/~xouyang/programs/dependencies/cavsat-jar.zip
 unzip cavsat-jar.zip
-
+rm cavsat-jar.zip
 
 # install cplex
 
@@ -22,9 +22,13 @@ chmod 700 cplex.bin
 # install MaxHS
 
 git clone https://github.com/fbacchus/MaxHS.git
+cp Makefile dependencies/MaxHS/
+cd dependencies/MaxHS
+make 
+cd ../../
 echo 'export PATH="$PATH:/fastdisk/LinCQA/dependencies/MaxHS/build/release/bin"' >> ~/.bash_profile
 echo 'export PATH="$PATH:/fastdisk/LinCQA/dependencies/MaxHS/build/release/bin"' >> ~/.bashrc
-source ~/.bashrc
+
 
 
 # install sqlserver
@@ -43,21 +47,23 @@ sudo apt-get update
 sudo apt-get install mssql-tools unixodbc-dev
 echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
 echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
-source ~/.bashrc
 
 
-mkdir sqlserver_storage/
-mkdir sqlserver_storage/data
-mkdir sqlserver_storage/log
 
-sudo chown mssql sqlserver_storage/data
-sudo chgrp mssql sqlserver_storage/data
+mkdir /fastdisk/sqlserver_storage/
+mkdir /fastdisk/sqlserver_storage/data
+mkdir /fastdisk/sqlserver_storage/log
 
-sudo chown mssql sqlserver_storage/log
-sudo chgrp mssql sqlserver_storage/log
+sudo chown mssql /fastdisk/sqlserver_storage/data
+sudo chgrp mssql /fastdisk/sqlserver_storage/data
+
+sudo chown mssql /fastdisk/sqlserver_storage/log
+sudo chgrp mssql /fastdisk/sqlserver_storage/log
 
 
-sudo /opt/mssql/bin/mssql-conf set filelocation.defaultdatadir sqlserver_storage/data
-sudo /opt/mssql/bin/mssql-conf set filelocation.defaultlogdir sqlserver_storage/log
+sudo /opt/mssql/bin/mssql-conf set filelocation.defaultdatadir /fastdisk/sqlserver_storage/data
+sudo /opt/mssql/bin/mssql-conf set filelocation.defaultlogdir /fastdisk/sqlserver_storage/log
 systemctl restart mssql-server
 
+source ~/.bashrc
+source ~/.bash_profile
