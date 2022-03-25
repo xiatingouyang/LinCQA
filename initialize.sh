@@ -22,6 +22,7 @@ chmod 700 cplex.bin
 # install MaxHS
 
 git clone https://github.com/fbacchus/MaxHS.git
+cd ..
 cp Makefile dependencies/MaxHS/
 cd dependencies/MaxHS
 make 
