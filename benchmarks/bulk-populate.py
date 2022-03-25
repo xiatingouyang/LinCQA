@@ -63,9 +63,17 @@ def insert_table(cnxn, cursor, table_name, attributes, input_dir, key_arity):
 
 def main():
 
-        f = open("schemas.json")
+
+        if len(sys.argv) < 3:
+            print("Usage: python3 bulk-populkate.py <path to schema.json> <path to dbinfo.json>")
+            return
+        schema_location = sys.argv[1]
+        dbinfo_location = sys.argv[2]
+
+
+        f = open(schema_location)
         schema = json.load(f)
-        dbinfo_f = open("dbinfo.json")
+        dbinfo_f = open(dbinfo_location)
         dbinfo = json.load(dbinfo_f)
         proj_dir = dbinfo["proj_dir"]
         for db_name in dbinfo["databases"]:
