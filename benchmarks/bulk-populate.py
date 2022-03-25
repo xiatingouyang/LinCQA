@@ -2,6 +2,7 @@ import pyodbc
 import json
 from cavsat_prepare import *
 from os.path import exists
+import sys
 
 # Some other example server values are
 # server = 'localhost\sqlexpress' # for a named instance
