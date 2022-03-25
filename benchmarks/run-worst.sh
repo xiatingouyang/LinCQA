@@ -1,5 +1,6 @@
 cd worst
 mkdir results
+mkdir data
 gcc gen.c -o gen
 
 for algo in lincqa-sql conquer fastfo; do
