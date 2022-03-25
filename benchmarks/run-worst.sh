@@ -22,7 +22,7 @@ for algo in lincqa-sql conquer fastfo; do
                 ./gen $a $b $N > data/r_1.csv
                 ./gen $b $c $N > data/r_2.csv
                 ./gen 2 2 100 > data/r_3.csv
-                python3 ../bulk-populate.py schema.json dbinfo.json
+                python3 ../bulk-populate.py schemas.json dbinfo.json
 
                 for it in {1..3}; do
                         { time sqlcmd -S localhost -U sa -P cqa2022! -d worst -i ${algo}/${query}.sql > output ; } 2>> results/${algo}_${a}_${b}_${c}.txt
@@ -42,7 +42,7 @@ for algo in lincqa-sql conquer fastfo; do
                 ./gen $a $b $N > data/r_1.csv
                 ./gen $b $c $N > data/r_2.csv
                 ./gen 2 2 100 > data/r_3.csv
-                python3 ../bulk-populate.py schema.json dbinfo.json
+                python3 ../bulk-populate.py schemas.json dbinfo.json
 
                 for it in {1..3}; do
                         { time sqlcmd -S localhost -U sa -P cqa2022! -d worst -i ${algo}/${query}.sql > output ; } 2>> results/${algo}_${a}_${b}_${c}.txt
@@ -68,7 +68,7 @@ for algo in lincqa-sql conquer fastfo; do
                 ./gen $a $b $N > data/r_1.csv
                 ./gen $b $c $N > data/r_2.csv
                 ./gen $c $d 100 > data/r_3.csv
-                python3 ../bulk-populate.py schema.json dbinfo.json
+                python3 ../bulk-populate.py schemas.json dbinfo.json
 
                 for it in {1..3}; do
                         { time sqlcmd -S localhost -U sa -P cqa2022! -d worst -i ${algo}/${query}.sql > output ; } 2>> results/${algo}_${a}_${b}_${c}_${d}.txt
@@ -86,7 +86,7 @@ for algo in lincqa-sql conquer fastfo; do
                 ./gen $a $b $N > data/r_1.csv
                 ./gen $b $c $N > data/r_2.csv
                 ./gen $c $d 100 > data/r_3.csv
-                python3 ../bulk-populate.py schema.json dbinfo.json
+                python3 ../bulk-populate.py schemas.json dbinfo.json
 
                 for it in {1..3}; do
                         { time sqlcmd -S localhost -U sa -P cqa2022! -d worst -i ${algo}/${query}.sql > output ; } 2>> results/${algo}_${a}_${b}_${c}_${d}.txt
