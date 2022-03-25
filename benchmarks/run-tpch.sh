@@ -1,6 +1,6 @@
 mkdir tpch/results
 
-for rewriting in sqls conquer lincqa-sqls; do
+for rewriting in sqls conquer lincqa-sql; do
 	for scale in 1 10; do
 	       for qid in 1 2 3 4 6 10 11 12 14 16 17 18 20 21; do
 	       		for it in {1..3}; do
