@@ -1,3 +1,5 @@
+mkdir synthetic/results
+
 for rewriting in sqls conquer lincqa-sql; do
         mode=size
         for scale in 100 500 1000 5000; do
