@@ -1,6 +1,11 @@
 mkdir dependencies
 cd dependencies
 
+# install python dependencies
+
+sudo apt install python3-pip
+pip3 install pyodbc
+
 # install JAVA
 
 apt install default-jre
