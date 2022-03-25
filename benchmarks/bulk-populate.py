@@ -11,7 +11,7 @@ def connect_db(db_name):
         server = 'localhost' 
         database = db_name
         username = 'SA' 
-        password = 'cqa2021!' 
+        password = 'cqa2022!' 
         cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
         cursor = cnxn.cursor()
 

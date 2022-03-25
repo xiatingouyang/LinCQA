@@ -18,14 +18,14 @@ for algo in lincqa-sql conquer fastfo; do
                 let ratio=incon/total
                 echo $a $b $c $N $ratio
 
-                sqlcmd -S localhost -U sa -P cqa2021! -i reset-worst.sql
+                sqlcmd -S localhost -U sa -P cqa2022! -i reset-worst.sql
                 ./gen $a $b $N > data/r_1.csv
                 ./gen $b $c $N > data/r_2.csv
                 ./gen 2 2 100 > data/r_3.csv
                 python3 ../bulk-populate.py schema.json dbinfo.json
 
                 for it in {1..3}; do
-                        { time sqlcmd -S localhost -U sa -P cqa2021! -d worst -i ${algo}/${query}.sql > output ; } 2>> results/${algo}_${a}_${b}_${c}.txt
+                        { time sqlcmd -S localhost -U sa -P cqa2022! -d worst -i ${algo}/${query}.sql > output ; } 2>> results/${algo}_${a}_${b}_${c}.txt
                 done
 
         done
@@ -38,14 +38,14 @@ for algo in lincqa-sql conquer fastfo; do
                 let ratio=incon/total
                 echo $a $b $c $N $ratio
 
-                sqlcmd -S localhost -U sa -P cqa2021! -i reset-worst.sql
+                sqlcmd -S localhost -U sa -P cqa2022! -i reset-worst.sql
                 ./gen $a $b $N > data/r_1.csv
                 ./gen $b $c $N > data/r_2.csv
                 ./gen 2 2 100 > data/r_3.csv
                 python3 ../bulk-populate.py schema.json dbinfo.json
 
                 for it in {1..3}; do
-                        { time sqlcmd -S localhost -U sa -P cqa2021! -d worst -i ${algo}/${query}.sql > output ; } 2>> results/${algo}_${a}_${b}_${c}.txt
+                        { time sqlcmd -S localhost -U sa -P cqa2022! -d worst -i ${algo}/${query}.sql > output ; } 2>> results/${algo}_${a}_${b}_${c}.txt
                 done
 
         done
@@ -64,14 +64,14 @@ for algo in lincqa-sql conquer fastfo; do
                 let ratio=incon/total
                 echo $a $b $c $d $N $ratio 
 
-                sqlcmd -S localhost -U sa -P cqa2021! -i reset-worst.sql
+                sqlcmd -S localhost -U sa -P cqa2022! -i reset-worst.sql
                 ./gen $a $b $N > data/r_1.csv
                 ./gen $b $c $N > data/r_2.csv
                 ./gen $c $d 100 > data/r_3.csv
                 python3 ../bulk-populate.py schema.json dbinfo.json
 
                 for it in {1..3}; do
-                        { time sqlcmd -S localhost -U sa -P cqa2021! -d worst -i ${algo}/${query}.sql > output ; } 2>> results/${algo}_${a}_${b}_${c}_${d}.txt
+                        { time sqlcmd -S localhost -U sa -P cqa2022! -d worst -i ${algo}/${query}.sql > output ; } 2>> results/${algo}_${a}_${b}_${c}_${d}.txt
                 done
         done
 
@@ -82,14 +82,14 @@ for algo in lincqa-sql conquer fastfo; do
                 let ratio=incon/total
                 echo $a $b $c $d $N $ratio 
 
-                sqlcmd -S localhost -U sa -P cqa2021! -i reset-worst.sql
+                sqlcmd -S localhost -U sa -P cqa2022! -i reset-worst.sql
                 ./gen $a $b $N > data/r_1.csv
                 ./gen $b $c $N > data/r_2.csv
                 ./gen $c $d 100 > data/r_3.csv
                 python3 ../bulk-populate.py schema.json dbinfo.json
 
                 for it in {1..3}; do
-                        { time sqlcmd -S localhost -U sa -P cqa2021! -d worst -i ${algo}/${query}.sql > output ; } 2>> results/${algo}_${a}_${b}_${c}_${d}.txt
+                        { time sqlcmd -S localhost -U sa -P cqa2022! -d worst -i ${algo}/${query}.sql > output ; } 2>> results/${algo}_${a}_${b}_${c}_${d}.txt
                 done
         done
 done
