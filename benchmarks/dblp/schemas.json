@@ -1,0 +1,36 @@
+{
+	"author" : {
+		"key" : [0, 1],
+		"attributes" : [
+				"name", "paper_key"
+		]
+	},
+
+	"citation" : {
+		"key" : [0, 1],
+		"attributes" : [
+				"paper_cite_key",
+				"paper_cited_key"
+		]
+	},
+
+	"conference" : {
+		"key" : [0],
+		"attributes" : [
+				"conf_key",
+				"name",
+				"detail"
+		]
+
+	},
+
+	"paper" : {
+		"key" : [3],
+		"attributes" : [
+				"title",
+				"year",
+				"conf_key",
+				"paper_key"
+		]
+	}
+}
