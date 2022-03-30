@@ -25,12 +25,12 @@
 	},
 
 	"paper" : {
-		"key" : [3],
+		"key" : [0],
 		"attributes" : [
+				"paper_key",
 				"title",
-				"year",
 				"conf_key",
-				"paper_key"
+				"year"
 		]
 	}
 }
