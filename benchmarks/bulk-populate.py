@@ -92,6 +92,8 @@ def main():
                             continue
 
 			##  cavsat statements
+                        if len(key_arity) == 0:
+                            continue
 
                         primary_key_lists = []
                         for i in range(len(schema[table_name]["attributes"])):
