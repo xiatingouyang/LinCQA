@@ -1,23 +1,14 @@
 Badges
-(UserId INT, Class TINYINT, Name NVARCHAR, Date DATETIME)
-
+UserId INT, Class TINYINT, Name NVARCHAR, Date DATETIME
 PostHistory
-(PostId INT, UserId INT, PostHistoryTypeId TINYINT, UserDisplayName NVARCHAR, CreationDate DATETIME)
-
-
+PostId INT, UserId INT, PostHistoryTypeId TINYINT, UserDisplayName NVARCHAR, CreationDate DATETIME
 Posts
-(Id INT, OwnerUserId INT, LastEditorUserId INT, PostTypeId TINYINT, AcceptedAnswerId INT, Score INT, ParentId INT, ViewCount INT, AnswerCount INT, CommentCount INT, OwnerDisplayName NVARCHAR, LastEditorDisplayName NVARCHAR,Title NVARCHAR,Tags NVARCHAR, FavoriteCount INT, CreationDate DATETIME, CommunityOwnedDate DATETIME, ClosedDate DATETIME, LastEditDate DATETIME, LastActivityDate DATETIME)
-
-
+Id INT, OwnerUserId INT, LastEditorUserId INT, PostTypeId TINYINT, AcceptedAnswerId INT, Score INT, ParentId INT, ViewCount INT, AnswerCount INT, CommentCount INT, OwnerDisplayName NVARCHAR, LastEditorDisplayName NVARCHAR,Title NVARCHAR,Tags NVARCHAR, FavoriteCount INT, CreationDate DATETIME, CommunityOwnedDate DATETIME, ClosedDate DATETIME, LastEditDate DATETIME, LastActivityDate DATETIME
 Users
-(Id INT, Reputation INT, Views INT, DownVotes INT, UpVotes INT, DisplayName NVARCHAR, Location NVARCHAR)
-
-
+Id INT, Reputation INT, Views INT, DownVotes INT, UpVotes INT, DisplayName NVARCHAR, Location NVARCHAR
 Comments
-(PostId INT, UserId INT, Score INT, UserDisplayName NVARCHAR, Text NVARCHAR, CreationDate DATETIME)
-
+PostId INT, UserId INT, Score INT, UserDisplayName NVARCHAR, Text NVARCHAR, CreationDate DATETIME
 PostLinks
-(RelatedPostId INT, PostId INT, LinkTypeId TINYINT, CreationDate DATETIME)
-
+RelatedPostId INT, PostId INT, LinkTypeId TINYINT, CreationDate DATETIME
 Votes
-(UserId INT, PostId INT, VoteTypeId TINYINT, BountyAmount INT, CreationDate DATETIME)
+UserId INT, PostId INT, VoteTypeId TINYINT, BountyAmount INT, CreationDate DATETIME
