@@ -92,7 +92,7 @@ def main():
                             continue
 
 			##  cavsat statements
-                        if len(key_arity) == 0:
+                        if len(key_arity) == 1 and key_arity[0] == -1:
                             continue
 
                         primary_key_lists = []
