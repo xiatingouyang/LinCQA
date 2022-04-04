@@ -24,14 +24,14 @@ def main():
 		print('"{}"'.format(new_line))
 
 		fail = True
-		while fail
+		while fail:
 			fail = True
 			try:
 				line = file.readline()[:-1]
 				fail = False
 			except UnicodeDecodeError:
 				pass
-		
+
 
 	file.close()
 
