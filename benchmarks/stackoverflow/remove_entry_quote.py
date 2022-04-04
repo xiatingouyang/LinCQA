@@ -6,7 +6,10 @@ def main():
 
 	file = open(input_filename, "r")
 
-	line = file.readline()[:-1]
+	try:
+		line = file.readline()[:-1]
+	except UnicodeDecodeError:
+		pass
 
 	while line != "":
 
@@ -20,7 +23,15 @@ def main():
 		new_line = '","'.join(new_entries)
 		print('"{}"'.format(new_line))
 
-		line = file.readline()[:-1]
+		fail = True
+		while fail
+			fail = True
+			try:
+				line = file.readline()[:-1]
+				fail = False
+			except UnicodeDecodeError:
+				pass
+		
 
 	file.close()
 
