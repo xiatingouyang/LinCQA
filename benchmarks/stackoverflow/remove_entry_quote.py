@@ -4,12 +4,9 @@ def main():
 
 	input_filename = sys.argv[1]
 
-	file = open(input_filename, "r")
+	file = open(input_filename, "r", errors='ignore')
 
-	try:
-		line = file.readline()[:-1]
-	except UnicodeDecodeError:
-		pass
+	line = file.readline()[-1]
 
 	while line != "":
 
@@ -23,15 +20,8 @@ def main():
 		new_line = '","'.join(new_entries)
 		print('"{}"'.format(new_line))
 
-		fail = True
-		while fail:
-			fail = True
-			try:
-				line = file.readline()[:-1]
-				fail = False
-			except UnicodeDecodeError:
-				pass
-
+		line = file.readline()[-1]
+		
 
 	file.close()
 
