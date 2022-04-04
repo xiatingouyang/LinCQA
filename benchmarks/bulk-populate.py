@@ -54,7 +54,8 @@ def insert_table(cnxn, cursor, table_name, attributes, input_dir, key_arity):
                     (
                     FIRSTROW = 1,
                     FIELDTERMINATOR = ',', 
-                    ROWTERMINATOR = '\n'
+                    ROWTERMINATOR = '\n',
+                    MAXERRORS = 1000000
                     )
         """.format(table_name, input_dir, table_name)
 
