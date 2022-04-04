@@ -25,15 +25,17 @@ def insert_table(cnxn, cursor, table_name, attributes, input_dir, key_arity):
             print("File not found: {}".format(path_to_file))
             return False
 
-
-
         attrs_in_creation = list()
-        for i in range(len(attributes)):
-            attr = attributes[i]
-            if i in key_arity:
-                attrs_in_creation.append(attr + " INT NOT NULL")
-            else:
-                attrs_in_creation.append(attr + " INT")
+        if " " in attributes[0]:
+            attrs_in_creation = attributes
+        else:
+        
+            for i in range(len(attributes)):
+                attr = attributes[i]
+                if i in key_arity:
+                    attrs_in_creation.append(attr + " INT NOT NULL")
+                else:
+                    attrs_in_creation.append(attr + " INT")
 
         attrs_in_creation_string = ", ".join(attrs_in_creation)
         create_table_sql = "if not exists (select * from sysobjects where name='{}' and xtype='U') CREATE TABLE {} ({})".format(
