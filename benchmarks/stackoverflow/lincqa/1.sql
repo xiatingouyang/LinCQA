@@ -49,7 +49,7 @@ Comments_bad_key as (
 
 	union 
 
-	select UserId
+	select Comments.UserId
 	from Comments 
 	left outer join Votes_good_join on Comments.UserId = Votes_good_join.UserId and Comments.PostId = Votes_good_join.PostId
 	where Votes_good_join.UserId is NULL or Votes_good_join.PostId is NULL
