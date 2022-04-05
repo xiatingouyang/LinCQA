@@ -34,7 +34,7 @@ Votes_good_join as (
 	where not exists (
 		select *
 		from Votes_bad_key
-		where Votes.UserId = Votes_bad_key.UserId and Votes.PostId = Votes_bad_key.PostId
+		where Votes.UserId = Votes_bad_key.UserId
 	)
 ),
 
