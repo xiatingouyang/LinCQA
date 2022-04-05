@@ -2,7 +2,7 @@ with candidate as (
 	select P.Id as PostId, U.Id as UserId, U.DisplayName
 	from Posts P, Users U
 	where P.OwnerUserId = U.Id and P.Tags like "<c++>"
-)
+),
 
 
 Users_bad_key as (
@@ -28,7 +28,7 @@ Users_good_join as (
 Posts_bad_key as (
 	select P.Id 
 	from Posts P
-	where Posts.Tags not like "<c++>"
+	where P.Tags not like "<c++>"
 
 	union all
 
@@ -46,7 +46,7 @@ Posts_good_join as (
 	where not exists (
 		select *
 		from Posts_bad_key
-		where P.Pid = Posts_bad_key.Id
+		where P.Id = Posts_bad_key.Id
 	)
 )
 
