@@ -14,7 +14,7 @@ Users_good_join as (
 	where not exists (
 		select * 
 		from Users_bad_key
-		where Users.Id = Users_bad_key.UserId
+		where Users.Id = Users_bad_key.Id
 	)
 ),
 
