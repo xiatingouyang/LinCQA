@@ -7,7 +7,7 @@ with candidates as (
 Posts_bad_key as (
 	select P.Id 
 	from Posts P
-	where P.Tags not LIKE "%SQL%"
+	where P.Tags not LIKE "%SQL%" or P.Tags is null
 
 	union all  
 
@@ -52,7 +52,7 @@ PostHistory_good_join as (
 Votes_bad_key as (
 	select V.PostId, V.UserId, V.CreationDate
 	from Votes V 
-	where V.BountyAmount <= 100
+	where V.BountyAmount <= 100 or V.BountyAmount is null
 ), 
 
 Votes_good_join as (
@@ -104,4 +104,5 @@ Comments_good_join as (
 
 select distinct Title
 from Comments_good_join
+
 

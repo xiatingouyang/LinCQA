@@ -12,13 +12,6 @@ Users_bad_key as (
 	) t
 	group by Id 
 	having count(*) > 1
-
-	union all 
-
-	select Id 
-	from Users 
-	left outer join Badges_good_join on (Users.Id = Badges_good_join.UserId)
-	where Badges_good_join.UserId is NULL
 ),
 
 Users_good_join as (
@@ -33,4 +26,6 @@ Users_good_join as (
 )
 
 select distinct Id, DisplayName
-from Users_good_join
+from Users_good_join, Badges_good_join
+where Users_good_join.Id = Badges_good_join.UserId
+
