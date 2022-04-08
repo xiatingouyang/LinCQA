@@ -5,7 +5,7 @@ WITH sfr AS (
     (
       SELECT
         b_1.Name AS a0,
-        b_1.DDate AS a1,
+        b_1.Date AS a1,
         u_0.DisplayName AS a2,
         u_0.Id AS a3
       FROM
@@ -28,7 +28,7 @@ yes_Badges AS (
         Badges b_1
       WHERE
         s_0.a0 = b_1.Name
-        AND s_0.a1 = b_1.DDate
+        AND s_0.a1 = b_1.Date
         AND s_0.a3 = b_1.UserId
     ) t
 ),
