@@ -1,11 +1,23 @@
+drop table candidate
 drop table candidates
-drop table Posts_bad_key
-drop table Posts_good_join
-drop table Comments_bad_key
-drop table Comments_good_join
+
 drop table Users_bad_key
 drop table Users_good_join
 
+drop table Posts_bad_key
+drop table Posts_good_join
+
+drop table PostHistory_bad_key
+drop table PostHistory_good_join
+
+drop table Comments_bad_key
+drop table Comments_good_join
+
+drop table Badges_bad_key
+drop table Badges_good_join
+
+drop table Votes_bad_key
+drop table Votes_good_Join
 
 SELECT DISTINCT P.Id as pid, C.UserId, C.CreationDate, U.Id as uid, U.DisplayName
 into candidates

@@ -60,7 +60,7 @@ Users_bad_key as (
 		from Users
 	) t 
 	group by Id 
-	having count(*) > 1;
+	having count(*) > 1
 ),
 
 
@@ -72,7 +72,7 @@ Users_good_join as (
 		select *
 		from Users_bad_key
 		where U.Id = Users_bad_key.Id
-	);
+	)
 )
 
 

@@ -51,7 +51,7 @@ Posts_good_join as (
       select * 
       from Posts_bad_key
       where P.Id = Posts_bad_key.Id 
-  );
+  )
 )
 
 

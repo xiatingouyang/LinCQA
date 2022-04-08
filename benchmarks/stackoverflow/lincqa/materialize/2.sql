@@ -1,8 +1,23 @@
 drop table candidate
+drop table candidates
+
 drop table Users_bad_key
 drop table Users_good_join
+
 drop table Posts_bad_key
 drop table Posts_good_join
+
+drop table PostHistory_bad_key
+drop table PostHistory_good_join
+
+drop table Comments_bad_key
+drop table Comments_good_join
+
+drop table Badges_bad_key
+drop table Badges_good_join
+
+drop table Votes_bad_key
+drop table Votes_good_Join
 
 
 select P.Id as PostId, U.Id as UserId, U.DisplayName
@@ -65,5 +80,5 @@ where not exists (
 );
 
 
-SELECT DISTINCT Posts_good_join.DisplayName
+SELECT DISTINCT DisplayName
 FROM Posts_good_join

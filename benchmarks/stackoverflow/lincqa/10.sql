@@ -1,9 +1,22 @@
 drop table candidates
-drop table Votes_bad_key
-drop table Votes_good_join
+
+drop table Users_bad_key
+drop table Users_good_join
+
 drop table Posts_bad_key
 drop table Posts_good_join
 
+drop table PostHistory_bad_key
+drop table PostHistory_good_join
+
+drop table Comments_bad_key
+drop table Comments_good_join
+
+drop table Badges_bad_key
+drop table Badges_good_join
+
+drop table Votes_bad_key
+drop table Votes_good_join
 
 
 SELECT DISTINCT P.id, P.title, V.PostId, V.UserId, V.CreationDate
@@ -15,7 +28,7 @@ WHERE P.Id = V.PostId AND P.OwnerUserId = V.UserId AND BountyAmount > 100;
 select V.PostId, V.UserId, V.CreationDate 
 into Votes_bad_key
 from Votes V
-join candidates C on V.PostId = C.PostId and V.UserId = C.UserId and V.CreationDate = C.CreationDate
+join candidates C on (V.PostId = C.PostId and V.UserId = C.UserId and V.CreationDate = C.CreationDate)
 where V.BountyAmount <= 100;
 
 
