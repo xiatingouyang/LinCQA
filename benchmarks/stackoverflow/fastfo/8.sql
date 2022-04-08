@@ -16,7 +16,7 @@ WITH sfr AS (
         u_0.Id = c_1.UserId
         AND c_1.PostId = p_2.Id
         AND p_2.Tags LIKE "%SQL%"
-        AND c_Score > 5
+        AND c_1.Score > 5
     ) t
 ),
 yes_Posts AS (
@@ -33,12 +33,13 @@ yes_Posts AS (
         s_0.a2 = p_1.Id
         AND NOT EXISTS (
           SELECT
-            p_2.PostId
+            p_2.Id
           FROM
-            Posts p2
+            Posts p_2
           WHERE
-            p_2.Tags IS NULL
-            OR p_2.Tags NOT LIKE "%SQL%"
+      p_1.Id = p_2.Id
+            AND (p_2.Tags IS NULL
+            OR p_2.Tags NOT LIKE "%SQL%")
         )
     ) t
 ),
@@ -62,7 +63,7 @@ bb_Comments AS (
         c_0.CreationDate,
         c_0.UserId
       FROM
-        Comments c
+        Comments c_0
       WHERE
         c_0.Score <= 5
     ) t
@@ -134,3 +135,4 @@ FROM
           AND neg_b_0.a1 = s_0.a3
       )
   ) t;
+
