@@ -28,36 +28,43 @@ FROM Posts P, PostHistory PH, Votes V, Comments C
 WHERE P.Tags LIKE "%SQL%" AND P.id = PH.PostId AND P.id = C.PostId AND P.id = V.PostId AND V.BountyAmount > 100 AND PH.PostHistoryTypeId = 2 AND C.score = 0;
 
 
-with Posts_bad_key as (
-	select P.Id 
-	from Posts P
-	where P.Tags not LIKE "%SQL%" or P.Tags is null
+-- with Posts_bad_key as (
+-- 	select P.Id 
+-- 	from Posts P
+-- 	where P.Tags not LIKE "%SQL%" or P.Tags is null
 
-	union all  
+-- 	union all  
 
-	select Id 
-	from (
-		select distinct Id, Title
-		from Posts
-	)t 
-	group by Id 
-	having count(*) > 1
-)
+-- 	select Id 
+-- 	from (
+-- 		select distinct Id, Title
+-- 		from Posts
+-- 	)t 
+-- 	group by Id 
+-- 	having count(*) > 1
+-- )
 
-select *
-into Posts_bad_key
-from Posts_bad_key;
-
+-- select *
+-- into Posts_bad_key
+-- from Posts_bad_key;
 
 
 select P.Id, P.Title
-into Posts_good_join 
-from Posts P 
-where not exists (
-	select *
-	from Posts_bad_key
-	where P.Id = Posts_bad_key.Id
-);
+into Posts_good_join
+from Posts P
+join candidates on (P.Id = candidates.Id)
+where P.Tags LIKE "%SQL%"
+
+
+-- select P.Id, P.Title
+-- into Posts_good_join 
+-- from Posts P 
+-- join candidates on (P.Id = candidates.Id)
+-- where not exists (
+-- 	select *
+-- 	from Posts_bad_key
+-- 	where P.Id = Posts_bad_key.Id
+-- );
 
 
 
