@@ -20,6 +20,7 @@ drop table Votes_good_join
 
 drop table PostHistory_bad_key
 drop table PostHistory_good_join
+go  
 
 Select DISTINCT C.UserId, C.CreationDate, P.Id, P.Title
 into candidates

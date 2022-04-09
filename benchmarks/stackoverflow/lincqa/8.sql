@@ -17,6 +17,7 @@ drop table Badges_good_join
 
 drop table Votes_bad_key
 drop table Votes_good_join
+go  
 
 SELECT DISTINCT P.Id as pid, C.UserId, C.CreationDate, U.Id as uid, U.DisplayName
 into candidates
