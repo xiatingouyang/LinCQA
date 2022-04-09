@@ -1,0 +1,16 @@
+Badges
+Id,UserId,Class,Name,TagBased,Date
+PostHistory
+Id,PostId,UserId,PostHistoryTypeId,UserDisplayName,ContentLicense,RevisionGUID,Text,Comment,CreationDate
+Posts
+Id,OwnerUserId,LastEditorUserId,PostTypeId,AcceptedAnswerId,Score,ParentId,ViewCount,AnswerCount,CommentCount,OwnerDisplayName,LastEditorDisplayName,Title,Tags,ContentLicense,Body,FavoriteCount,CreationDate,CommunityOwnedDate,ClosedDate,LastEditDate,LastActivityDate
+Users
+Id,AccountId,Reputation,Views,DownVotes,UpVotes,DisplayName,Location,ProfileImageUrl,WebsiteUrl,AboutMe,CreationDate,LastAccessDate
+Comments
+Id,PostId,UserId,Score,ContentLicense,UserDisplayName,Text,CreationDate
+PostLinks
+Id,RelatedPostId,PostId,LinkTypeId,CreationDate
+Tags
+Id,ExcerptPostId,WikiPostId,TagName,Count
+Votes
+Id,UserId,PostId,VoteTypeId,BountyAmount,CreationDate

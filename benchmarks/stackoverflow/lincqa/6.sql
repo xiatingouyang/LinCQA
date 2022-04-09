@@ -1,25 +1,25 @@
-drop table candidates
+drop table if exists candidates
 
-drop table Users_bad_key
-drop table Users_good_join
+drop table if exists Users_bad_key
+drop table if exists Users_good_join
 
-drop table Posts_bad_key
-drop table Posts_good_join
+drop table if exists Posts_bad_key
+drop table if exists Posts_good_join
 
-drop table PostHistory_bad_key
-drop table PostHistory_good_join
+drop table if exists PostHistory_bad_key
+drop table if exists PostHistory_good_join
 
-drop table Comments_bad_key
-drop table Comments_good_join
+drop table if exists Comments_bad_key
+drop table if exists Comments_good_join
 
-drop table Badges_bad_key
-drop table Badges_good_join
+drop table if exists Badges_bad_key
+drop table if exists Badges_good_join
 
-drop table Votes_bad_key
-drop table Votes_good_join
+drop table if exists Votes_bad_key
+drop table if exists Votes_good_join
 
-drop table PostHistory_bad_key
-drop table PostHistory_good_join
+drop table if exists PostHistory_bad_key
+drop table if exists PostHistory_good_join
 go  
 
 Select DISTINCT C.UserId, C.CreationDate, P.Id, P.Title
