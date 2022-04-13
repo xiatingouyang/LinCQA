@@ -1,42 +1,7 @@
-WITH Candidates_Posts AS (
-  SELECT
-    DISTINCT Posts.Id,
-    Users.DisplayName
-  FROM
-    Posts,
-    Users
-  WHERE
-    Posts.OwnerUserId = Users.Id AND Posts.Tags LIKE "<c++>"
-),
-Filter_Posts AS (
-  SELECT
-    C.Id
-  FROM
-    Candidates_Posts C
-    JOIN Posts ON C.Id = Posts.Id
-    LEFT OUTER JOIN Users ON Posts.OwnerUserId = Users.Id
-  WHERE
-    (Users.Id IS NULL)
-  UNION ALL
-  SELECT
-    C.Id
-  FROM
-    Candidates_Posts C
-  GROUP BY
-    C.Id
-  HAVING
-    COUNT(*) > 1
+WITH Candidates_Users_Badges AS (
+        SELECT DISTINCT Users.Id, Badges.Name, Badges.UserId, Badges.Date, Users.DisplayName FROM Users, Badges WHERE Badges.UserId = Users.Id AND Badges.name = "Illuminator"
+), 
+        Filter_Users_Badges AS (
+                SELECT C.Id, C.Name, C.UserId, C.Date FROM Candidates_Users_Badges C GROUP BY C.Id, C.Name, C.UserId, C.Date HAVING COUNT(*) > 1
 )
-SELECT
-  DISTINCT DisplayName
-FROM
-  Candidates_Posts C
-WHERE
-  NOT EXISTS (
-    SELECT
-      *
-    FROM
-      Filter_Posts F
-    WHERE
-      C.Id = F.Id
-  )
+        SELECT DISTINCT Id, DisplayName FROM Candidates_Users_Badges C WHERE NOT EXISTS (SELECT * FROM Filter_Users_Badges F WHERE C.Id = F.Id AND C.Name = F.Name AND C.UserId = F.UserId AND C.Date = F.Date)
