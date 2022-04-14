@@ -1,7 +1,0 @@
-{
-	"proj_dir": "/fastdisk/LinCQA/benchmarks/worst", 
-	"databases": 
-		{
-			"worst" : "data"
-		}
-}

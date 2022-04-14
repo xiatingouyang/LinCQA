@@ -1,6 +1,0 @@
-{	
-		"proj_dir" : "/fastdisk/LinCQA/benchmarks/dblp",
-		"databases" : {
-			"dblp" : "data"
-       }
-}

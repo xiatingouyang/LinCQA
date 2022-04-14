@@ -1,7 +1,0 @@
-{	
-		"proj_dir" : "/fastdisk/LinCQA/benchmarks/tpch",
-		"databases" : {
-			"tpch_1" : "data/tpch_1",
-	        "tpch_10" : "data/tpch_10"
-       }
-}
