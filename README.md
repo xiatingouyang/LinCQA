@@ -29,7 +29,7 @@ where ```rewriting``` can be ```lincqa```, ```conquer```and ```fastfo```.
 
 ## StackOverflow dataset
 
-The original SQL queries for the StackOverflow workload is stored under
+The original SQL queries for the StackOverflow workload is located at
 ```
 benchmarks/stackoverflow/sqls/
 ```
@@ -39,14 +39,15 @@ benchmarks/stackoverflow/{rewriting}/
 ```
 where ```rewriting``` can be ```lincqa```, ```conquer```and ```fastfo```.
 
-We note that the LinCQA rewriting can be implemented using either views or intermediate tables, stored in 
 
-```
-benchmarks/stackoverflow/{rewriting}/views
-```
-and
-```
-benchmarks/stackoverflow/{rewriting}/materialize
-```
-respectively.
+## Worst case dataset
 
+The original SQL queries for the worst case dataset is located at
+```
+benchmarks/worst/sqls/
+```
+Their corresponding rewritings are in 
+```
+benchmarks/worst/{rewriting}/
+```
+where ```rewriting``` can be ```lincqa```, ```conquer```and ```fastfo```.
