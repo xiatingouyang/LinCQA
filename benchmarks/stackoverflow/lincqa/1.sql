@@ -5,7 +5,7 @@ WITH Candidates_Posts AS (
 ),
 
 
-Filter_Posts AS (
+Posts_bad_key AS (
   SELECT
     C.Id
   FROM
@@ -38,7 +38,7 @@ WHERE
     SELECT
       *
     FROM
-      Filter_Posts F
+      Posts_bad_key F
     WHERE
       C.Id = F.Id
 
