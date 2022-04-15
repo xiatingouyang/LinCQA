@@ -14,10 +14,10 @@ WITH sfr AS (
       WHERE
         p_0.Id = v_1.PostId
         AND p_0.OwnerUserId = v_1.UserId
-  AND v_1.BountyAmount > 100
+        AND v_1.BountyAmount > 100
     ) t
 ),
-bad_Votes AS (
+bb_Votes AS (
   SELECT
     DISTINCT *
   FROM
@@ -25,15 +25,14 @@ bad_Votes AS (
       SELECT
         s_0.a0 AS a0,
         s_0.a2 AS a1,
-  s_0.a3 AS a2
+        s_0.a3 AS a2
       FROM
-        sfr s_0,
-        Votes v_1
-      WHERE
-        s_0.a0 = v_1.PostId
+        sfr s_0
+        INNER JOIN Votes v_1 ON s_0.a0 = v_1.PostId
         AND s_0.a2 = v_1.UserId
         AND s_0.a3 = v_1.CreationDate
-        AND v_1.BountyAmount <= 100
+      WHERE
+        v_1.BountyAmount <= 100
     ) t
 ),
 yes_Votes AS (
@@ -51,14 +50,17 @@ yes_Votes AS (
         s_0.a0 = v_1.PostId
         AND s_0.a2 = v_1.UserId
         AND s_0.a3 = v_1.CreationDate
-  AND NOT EXISTS ( 
-     SELECT *
-     FROM bad_Votes bv
-     WHERE 
-       v_1.Id = bv.a0
-             AND v_1.UserId = bv.a1
-       AND v_1.CreationDate = bv.a2 
-  )
+        AND v_1.BountyAmount > 100
+        AND NOT EXISTS (
+          SELECT
+            *
+          FROM
+            bb_Votes neg_b_0
+          WHERE
+            neg_b_0.a0 = s_0.a0
+            AND neg_b_0.a1 = s_0.a2
+            AND neg_b_0.a2 = s_0.a3
+        )
     ) t
 ),
 bb_Posts AS (
@@ -71,11 +73,13 @@ bb_Posts AS (
         s_0.a1 AS a1
       FROM
         sfr s_0
-        JOIN Posts p_1 ON s_0.a0 = p_1.Id
-        LEFT OUTER JOIN yes_Votes y_2 ON p_1.Id = y_2.a0
+        INNER JOIN Posts p_1 ON s_0.a0 = p_1.Id
+        LEFT OUTER JOIN yes_Votes y_2 ON s_0.a0 = p_1.Id
+        AND p_1.Id = y_2.a0
         AND p_1.OwnerUserId = y_2.a1
       WHERE
-        y_2.a0 IS NULL
+        p_1.Id IS NULL
+        OR y_2.a0 IS NULL
         OR y_2.a1 IS NULL
         OR p_1.Title != s_0.a1
     ) t
@@ -103,4 +107,4 @@ FROM
           neg_b_0.a0 = s_0.a0
           AND neg_b_0.a1 = s_0.a1
       )
-  ) t
+  ) t;

@@ -12,7 +12,7 @@ WITH sfr AS (
         Posts p_1
       WHERE
         u_0.Id = p_1.OwnerUserId
-	AND p_1.Tags LIKE "<c++>"
+        AND p_1.Tags LIKE "<c++>"
     ) t
 ),
 bb_Users AS (
@@ -71,6 +71,8 @@ bb_Posts AS (
       WHERE
         y_2.a0 IS NULL
         OR y_2.a1 IS NULL
+        OR p_1.Tags IS NULL
+        OR p_1.Tags NOT LIKE "<c++>"
     ) t
 )
 SELECT
@@ -85,6 +87,7 @@ FROM
     WHERE
       s_0.a1 = p_1.Id
       AND s_0.a2 = p_1.OwnerUserId
+      AND p_1.Tags LIKE "<c++>"
       AND NOT EXISTS (
         SELECT
           *
