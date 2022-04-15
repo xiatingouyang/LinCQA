@@ -4,18 +4,18 @@ WITH sfr AS (
   FROM
     (
       SELECT
-        u_0.DisplayName AS a0,
-        p_1.Id AS a1,
-        u_0.Id AS a2
+        r_1.A23 AS a0,
+        r_0.A11 AS a1,
+        r_0.A12 AS a2,
+        r_0.A13 AS a3
       FROM
-        Users u_0,
-        Posts p_1
+        r_1 r_0,
+        r_2 r_1
       WHERE
-        u_0.Id = p_1.OwnerUserId
-        AND p_1.Tags LIKE "<c++>"
+        r_0.A12 = r_1.A21
     ) t
 ),
-bb_Users AS (
+bb_r_2 AS (
   SELECT
     DISTINCT *
   FROM
@@ -25,12 +25,12 @@ bb_Users AS (
         s_0.a2 AS a1
       FROM
         sfr s_0
-        INNER JOIN Users u_1 ON s_0.a2 = u_1.Id
+        INNER JOIN r_2 r_1 ON s_0.a2 = r_1.A21
       WHERE
-        u_1.DisplayName != s_0.a0
+        r_1.A23 != s_0.a0
     ) t
 ),
-yes_Users AS (
+yes_r_2 AS (
   SELECT
     DISTINCT *
   FROM
@@ -40,39 +40,39 @@ yes_Users AS (
         s_0.a2 AS a1
       FROM
         sfr s_0,
-        Users u_1
+        r_2 r_1
       WHERE
-        s_0.a0 = u_1.DisplayName
-        AND s_0.a2 = u_1.Id
+        s_0.a0 = r_1.A23
+        AND s_0.a2 = r_1.A21
         AND NOT EXISTS (
           SELECT
             *
           FROM
-            bb_Users neg_b_0
+            bb_r_2 neg_b_0
           WHERE
             neg_b_0.a0 = s_0.a0
             AND neg_b_0.a1 = s_0.a2
         )
     ) t
 ),
-bb_Posts AS (
+bb_r_1 AS (
   SELECT
     DISTINCT *
   FROM
     (
       SELECT
         s_0.a0 AS a0,
-        s_0.a1 AS a1
+        s_0.a1 AS a1,
+        s_0.a3 AS a2
       FROM
         sfr s_0
-        INNER JOIN Posts p_1 ON s_0.a1 = p_1.Id
-        LEFT OUTER JOIN yes_Users y_2 ON s_0.a0 = y_2.a0
-        AND p_1.OwnerUserId = y_2.a1
+        INNER JOIN r_1 r_1 ON s_0.a1 = r_1.A11
+        LEFT OUTER JOIN yes_r_2 y_2 ON s_0.a0 = y_2.a0
+        AND r_1.A12 = y_2.a1
       WHERE
         y_2.a0 IS NULL
         OR y_2.a1 IS NULL
-        OR p_1.Tags IS NULL
-        OR p_1.Tags NOT LIKE "<c++>"
+        OR r_1.A13 != s_0.a3
     ) t
 )
 SELECT
@@ -80,22 +80,24 @@ SELECT
 FROM
   (
     SELECT
-      s_0.a0 AS a0
+      s_0.a3 AS a0,
+      s_0.a0 AS a1
     FROM
       sfr s_0,
-      Posts p_1
+      r_1 r_1
     WHERE
-      s_0.a1 = p_1.Id
-      AND s_0.a2 = p_1.OwnerUserId
-      AND p_1.Tags LIKE "<c++>"
+      s_0.a1 = r_1.A11
+      AND s_0.a2 = r_1.A12
+      AND s_0.a3 = r_1.A13
       AND NOT EXISTS (
         SELECT
           *
         FROM
-          bb_Posts neg_b_0
+          bb_r_1 neg_b_0
         WHERE
           neg_b_0.a0 = s_0.a0
           AND neg_b_0.a1 = s_0.a1
+          AND neg_b_0.a2 = s_0.a3
       )
   ) t;
 

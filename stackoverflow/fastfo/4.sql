@@ -15,8 +15,22 @@ WITH sfr AS (
       WHERE
         u_0.Id = c_1.UserId
         AND c_1.PostId = p_2.Id
-        AND p_2.Tags LIKE "%SQL%"
         AND c_1.Score > 5
+        AND p_2.Tags LIKE "%SQL%"
+    ) t
+),
+bb_Posts AS (
+  SELECT
+    DISTINCT *
+  FROM
+    (
+      SELECT
+        s_0.a2 AS a0
+      FROM
+        sfr s_0
+        INNER JOIN Posts p_1 ON s_0.a2 = p_1.Id
+      WHERE
+        p_1.Tags IS NULL OR p_1.Tags NOT LIKE "%SQL%"
     ) t
 ),
 yes_Posts AS (
@@ -31,15 +45,14 @@ yes_Posts AS (
         Posts p_1
       WHERE
         s_0.a2 = p_1.Id
+        AND p_1.Tags LIKE "%SQL%"
         AND NOT EXISTS (
           SELECT
-            p_2.Id
+            *
           FROM
-            Posts p_2
+            bb_Posts neg_b_0
           WHERE
-      p_1.Id = p_2.Id
-            AND (p_2.Tags IS NULL
-            OR p_2.Tags NOT LIKE "%SQL%")
+            neg_b_0.a0 = s_0.a2
         )
     ) t
 ),
@@ -58,14 +71,7 @@ bb_Comments AS (
         LEFT OUTER JOIN yes_Posts y_2 ON c_1.PostId = y_2.a0
       WHERE
         y_2.a0 IS NULL
-      UNION
-      SELECT
-        c_0.CreationDate,
-        c_0.UserId
-      FROM
-        Comments c_0
-      WHERE
-        c_0.Score <= 5
+        OR c_1.Score <= 5
     ) t
 ),
 yes_Comments AS (
@@ -82,6 +88,7 @@ yes_Comments AS (
         s_0.a0 = c_1.CreationDate
         AND s_0.a2 = c_1.PostId
         AND s_0.a3 = c_1.UserId
+        AND c_1.Score > 5
         AND NOT EXISTS (
           SELECT
             *
