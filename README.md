@@ -1,6 +1,6 @@
 # LinCQA
 
-The repository contains the extended version of the paper **LinCQA: Faster Consistent Query Answering with Linear Time Guarantees** and the rewritings of all queries by all CQA systems to reproduce the results in the paper.
+The repository contains the extended version of the paper **LinCQA: Faster Consistent Query Answering with Linear Time Guarantees** ([arXiv](https://arxiv.org/abs/2208.12339)) and the rewritings of all queries by all CQA systems to reproduce the results in the paper.
 
 The implementations of LinCQA, improved version of ConQuer, and FastFO are being refactored and will be published by SIGMOD 2023.
 
