@@ -2,7 +2,7 @@
 
 This repository accompanies the paper [LinCQA: Faster Consistent Query Answering with Linear Time Guarantees](https://arxiv.org/abs/2208.12339), to appear in SIGMOD 2023. 
 It currently contains the rewritings of all queries by all CQA systems to reproduce the results in the paper. 
-The implementations of LinCQA, improved version of ConQuer, and FastFO are being refactored and will be published by SIGMOD 2023.
+The implementations of LinCQA, improved versions of ConQuer and FastFO are being refactored and will be published by SIGMOD 2023.
 
 ## Synthetic dataset
 The original SQL queries for the synthetic dataset is stored under
