@@ -4,16 +4,16 @@ sys.path.append("../../")
 from src.fo_rewriter.FORewriter import *
 
 
-class LinCQARewriter(FORewriter):
+class ConQuerRewriter(FORewriter):
 
 	def __init__(self):
-		print("initialized LinCQA rewriter")
+		print("initialized conquer rewriter")
 
 	def rewrite_as_sql(self, cq):
-		print("TODO conquer sql")
+		return ("TODO conquer sql")
 
 	def rewrite_as_datalog(self, cq):
-		print("TODO conquer datalog")
+		return ("TODO conquer datalog")
 
 	def is_rewritable(self, cq):
 		return self.is_fo(cq)

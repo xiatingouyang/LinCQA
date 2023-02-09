@@ -21,7 +21,7 @@ def main():
 	input_sql_dir_str = ""
 	algorithm = ""
 	output_dir = ""
-	output_as_sql = True
+	is_rewrite_as_sql = True
 
 	error_found = False
 
@@ -33,7 +33,7 @@ def main():
 			input_sql_dir_str = sys.argv[arg_index + 1]
 
 		elif sys.argv[arg_index] == "-algo" and arg_index + 1 < argc:
-			if sys.argv[arg_index + 1] in ["lincqa", "fastfo", "conquer", "plain"]:
+			if sys.argv[arg_index + 1] in ["lincqa", "fastfo", "conquer"]:
 				algorithm = sys.argv[arg_index + 1]
 			else:
 				error_found = True
@@ -43,9 +43,9 @@ def main():
 
 		elif sys.argv[arg_index] == "-f" and arg_index + 1 < argc:
 			if sys.argv[arg_index + 1] == "sql":
-				output_as_sql = True
+				is_rewrite_as_sql = True
 			elif sys.argv[arg_index + 1] == "datalog":
-				output_as_sql = False
+				is_rewrite_as_sql = False
 			else:
 				error_found = True
 
@@ -55,6 +55,14 @@ def main():
 	schema = Schema(schema_dir_str)
 	cq = ConjunctiveQuery(input_sql_dir_str, schema)
 
+	if algorithm == "lincqa":
+		rewriter = LinCQARewriter()
+	elif algorithm == "fastfo":
+		rewriter = FastFORewriter()
+	elif algorithm == "conquer":
+		rewriter = ConQuerRewriter()
+
+	rewriter.rewrite(cq, is_rewrite_as_sql, output_dir)
 	return
 
 

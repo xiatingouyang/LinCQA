@@ -1,0 +1,124 @@
+{
+    "Users": {
+        "key": [
+            0
+        ],
+        "attributes": [
+            "Id",
+            "AboutMe",
+            "Age",
+            "CreationDate",
+            "DisplayName",
+            "DownVotes",
+            "EmailHash",
+            "LastAccessDate",
+            "Location",
+            "Reputation",
+            "UpVotes",
+            "Views",
+            "WebsiteUrl",
+            "AccountId"
+        ]
+    },
+    "Posts": {
+        "key": [
+            0
+        ],
+        "attributes": [
+            "Id",
+            "AcceptedAnswerId",
+            "AnswerCount",
+            "Body",
+            "ClosedDate",
+            "CommentCount",
+            "CommunityOwnedDate",
+            "CreationDate",
+            "FavoriteCount",
+            "LastActivityDate",
+            "LastEditDate",
+            "LastEditorDisplayName",
+            "LastEditorUserId",
+            "OwnerUserId",
+            "ParentId",
+            "PostTypeId",
+            "Score",
+            "Tags",
+            "Title",
+            "ViewCount"
+        ]
+    },
+    "PostLinks": {
+        "key": [
+            2,
+            3,
+            4
+        ],
+        "attributes": [
+            "Id",
+            "CreationDate",
+            "PostId",
+            "RelatedPostId",
+            "LinkTypeId"
+        ]
+    },
+    "PostHistory": {
+        "key": [
+            1,
+            2,
+            4,
+            5
+        ],
+        "attributes": [
+            "Id",
+            "PostHistoryTypeId",
+            "PostId",
+            "RevisionGUID",
+            "CreationDate",
+            "UserId",
+            "UserDisplayName",
+            "Comment",
+            "Text"
+        ]
+    },
+    "Comments": {
+        "key": [
+            1,
+            5
+        ],
+        "attributes": [
+            "Id",
+            "CreationDate",
+            "PostId",
+            "Score",
+            "Text",
+            "UserId"
+        ]
+    },
+    "Badges": {
+        "key": [
+            1,
+            2
+        ],
+        "attributes": [
+            "Id",
+            "Name",
+            "UserId",
+            "Date"
+        ]
+    },
+    "Votes": {
+        "key": [
+            1,
+            2,
+            5
+        ],
+        "attributes": [
+            "Id",
+            "PostId",
+            "UserId",
+            "BountyAmount",
+            "VoteTypeId",
+            "CreationDate"
+        ]
+    }
+}

@@ -10,10 +10,10 @@ class LinCQARewriter(FORewriter):
 		print("initialized LinCQA rewriter")
 
 	def rewrite_as_sql(self, cq):
-		print("TODO lincqa sql")
+		return ("TODO lincqa sql")
 
 	def rewrite_as_datalog(self, cq):
-		print("TODO lincqa sql")
+		return ("TODO lincqa datalog")
 
 	def is_rewritable(self, cq):
 		return self.is_fo(cq)
