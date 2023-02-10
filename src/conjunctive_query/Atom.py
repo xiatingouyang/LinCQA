@@ -1,6 +1,6 @@
 class Atom:
 
-	def __init__(self, name, variables, pk_positions=[], attributes=None, negated=False):
+	def __init__(self, name, variables, pk_positions=[], attributes=None, negated=False, comparators=[]):
 		self.name = name
 		self.variables = variables
 		self.pk_positions = pk_positions
@@ -9,6 +9,7 @@ class Atom:
 		else:
 			self.attributes = ["A{}".format(i) for i in range(1, len(self.variables) + 1)]
 		self.negated = negated
+		self.comparators = comparators
 
 	def get_arity(self):
 		return len(self.variables)

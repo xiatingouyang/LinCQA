@@ -66,14 +66,18 @@ class ConjunctiveQuery(Rule):
         self.head = None
         self.body = []
 
+        # print(sql_str_lower)
+        # print(atom_names, free_vars, joining_vars)
 
         schema_json = schema_obj.schema
         attr_mapping = {}
         for table in atom_names:
             for attr in schema_json[table]["attributes"]:
-                attr_mapping[attr] = attr
+                attr_mapping[attr.lower()] = attr.lower()
 
         cnt = 0 
+        var_to_display = free_vars.copy()
+
         for joining_var in joining_vars:
             if "=" not in joining_var:
                 continue
@@ -87,12 +91,15 @@ class ConjunctiveQuery(Rule):
 
             if var1.isnumeric():
                 attr_mapping[var2] = var1
+                var_to_display.append(var1)
             elif var2.isnumeric():
                 attr_mapping[var1] = var2 
+                var_to_display.append(var2)
             else:
                 var1_root = var1 
                 var2_root = var2 
-
+                var_to_display.append(var1)
+                var_to_display.append(var2)
                 while var1_root != attr_mapping[var1_root]:
                     var1_root = attr_mapping[var1_root]
                 while var2_root != attr_mapping[var2_root]:
@@ -113,7 +120,7 @@ class ConjunctiveQuery(Rule):
             body = []
             index = 0
             for attr in schema_json[table]["attributes"]:
-                var_root = attr 
+                var_root = attr.lower() 
                 is_constant = False
                 while var_root != attr_mapping[var_root]:
                     var_root = attr_mapping[var_root]
@@ -121,8 +128,10 @@ class ConjunctiveQuery(Rule):
                         is_constant = True
                         break
 
-                    
-                var = Variable(var_root.upper(), is_constant)
+                if var_root in var_to_display:    
+                    var = Variable(var_root.upper(), is_constant)
+                else:
+                    var = Variable()
                 body.append(var)                
                 index += 1 
 
