@@ -12,3 +12,7 @@ class Variable:
 
 	def is_wildcard(self):
 		return self.name == "_"
+
+
+	def set_is_constant(is_constant):
+		self.is_constant = is_constant

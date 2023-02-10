@@ -1,5 +1,5 @@
 
-python3 rewriter.py -s benchmarks/tpch/schemas.json -i benchmarks/tpch/sqls/1.sql -algo lincqa
+python3 rewriter.py -s benchmarks/tpch/schemas.json -i benchmarks/tpch/sqls/10.sql -algo lincqa
 		
 # for benchmark in tpch; do
 # 	for qid in 1; do

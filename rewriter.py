@@ -55,6 +55,11 @@ def main():
 	schema = Schema(schema_dir_str)
 	cq = ConjunctiveQuery(input_sql_dir_str, schema)
 
+	print("=========== Parsed Conjunctive Query ==========")
+	print(cq)
+
+
+	print("=========== Rewriting ==========")
 	if algorithm == "lincqa":
 		rewriter = LinCQARewriter()
 	elif algorithm == "fastfo":
