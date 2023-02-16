@@ -1,3 +1,3 @@
-SELECT DISTINCT U.Id, U.DisplayName
-FROM Users U, Posts P, Comments C
-WHERE C.UserId = U.Id AND C.PostId = P.Id AND P.Tags LIKE "%SQL%" AND C.Score > 5
+SELECT DISTINCT Users.Id, Users.DisplayName
+FROM Users, Posts, Comments
+WHERE Comments.UserId = Users.Id AND Comments.PostId = Posts.Id AND Posts.Tags LIKE "%SQL%" AND Comments.Score > 5

@@ -1,5 +1,5 @@
 {
-    "Users": {
+    "users": {
         "key": [
             0
         ],
@@ -20,7 +20,7 @@
             "AccountId"
         ]
     },
-    "Posts": {
+    "posts": {
         "key": [
             0
         ],
@@ -47,7 +47,7 @@
             "ViewCount"
         ]
     },
-    "PostLinks": {
+    "postlinks": {
         "key": [
             2,
             3,
@@ -61,7 +61,7 @@
             "LinkTypeId"
         ]
     },
-    "PostHistory": {
+    "posthistory": {
         "key": [
             1,
             2,
@@ -80,7 +80,7 @@
             "Text"
         ]
     },
-    "Comments": {
+    "comments": {
         "key": [
             1,
             5
@@ -94,7 +94,7 @@
             "UserId"
         ]
     },
-    "Badges": {
+    "badges": {
         "key": [
             1,
             2
@@ -106,7 +106,7 @@
             "Date"
         ]
     },
-    "Votes": {
+    "votes": {
         "key": [
             1,
             2,

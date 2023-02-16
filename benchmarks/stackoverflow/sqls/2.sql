@@ -1,3 +1,3 @@
-SELECT DISTINCT U.Id, U.DisplayName
-FROM Users U, Badges B
-WHERE U.Id = B.UserId AND B.name = "Illuminator"
+SELECT DISTINCT Users.Id, Users.DisplayName
+FROM Users, Badges
+WHERE Users.Id = Badges.UserId AND Badges.name = "Illuminator"

@@ -30,6 +30,9 @@ class Atom:
 				var_str_list.append("{}".format(self.variables[i]))
 
 		atom_str = "{}({})".format(self.name, ", ".join(var_str_list))
+		if self.comparators:
+			comp_str = ", ".join([comp.__repr__() for comp in self.comparators])
+			atom_str = "{}, {}".format(atom_str, comp_str)	
 		if self.negated:
 			ret = "!{}".format(atom_str)
 		else:

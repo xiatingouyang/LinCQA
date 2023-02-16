@@ -3,6 +3,7 @@ sys.path.append("../../")
 from src.conjunctive_query.Rule import *
 from src.conjunctive_query.Variable import *
 from src.conjunctive_query.Atom import *
+from src.conjunctive_query.Comparator import *
 
 
 def parse(sql):
@@ -38,7 +39,10 @@ def parse(sql):
     joining_vars_temp = join_line.split("and")
     joining_vars = []
     for jv in joining_vars_temp:
-        joining_vars.append(jv.replace(" ", ""))
+        if "=" in jv or ">" in jv or "<" in jv or "<=" in jv or ">=" in jv:
+            joining_vars.append(jv.replace(" ", ""))
+        elif "like" in jv:
+            joining_vars.append(jv)
 
     return atom_names, free_vars, joining_vars
 
@@ -67,34 +71,47 @@ class ConjunctiveQuery(Rule):
         self.body = []
 
         # print(sql_str_lower)
-        # print(atom_names, free_vars, joining_vars)
-
+        
         schema_json = schema_obj.schema
         attr_mapping = {}
         for table in atom_names:
             for attr in schema_json[table]["attributes"]:
-                attr_mapping[attr.lower()] = attr.lower()
+                full_attr = "{}.{}".format(table, attr).lower()
+                attr_mapping[full_attr] = full_attr
 
         cnt = 0 
         var_to_display = free_vars.copy()
 
-        for joining_var in joining_vars:
-            if "=" not in joining_var:
-                continue
-            arg1, arg2 = joining_var.split("=")
-            var1 = arg1
-            var2 = arg2
-            if "." in var1:
-                var1 = arg1.split(".")[1]
-            if "." in var2:
-                var2 = arg2.split(".")[1]
 
-            if var1.isnumeric():
-                attr_mapping[var2] = var1
-                var_to_display.append(var1)
-            elif var2.isnumeric():
-                attr_mapping[var1] = var2 
-                var_to_display.append(var2)
+        comparators_dict = {}
+
+        for joining_var in joining_vars:
+
+            operators = ["=", "<", ">", "<=", ">=", "like"]
+            operator = None
+            for op in operators:
+                if op in joining_var:
+                    operator = op
+            if not operator:
+                continue
+
+
+            arg1, arg2 = joining_var.split(operator)
+            var1 = arg1.lower().replace(" ", "")
+            var2 = arg2.lower().replace(" ", "")
+            # if "." in var1:
+            #     var1 = arg1.split(".")[1]
+            # if "." in var2:
+            #     var2 = arg2.split(".")[1]
+            if "." not in var1 or  "." not in var2 or "=" not in joining_var:
+                if var1.isnumeric() or '"' in var1 or "%" in var1:
+                    comparators_dict[var2] = []
+                    comparators_dict[var2].append([operator, var1])
+                    var_to_display.append(var2)
+                elif var2.isnumeric() or '"' in var2 or "%" in var2:
+                    comparators_dict[var1] = []
+                    comparators_dict[var1].append([operator, var2])
+                    var_to_display.append(var1)
             else:
                 var1_root = var1 
                 var2_root = var2 
@@ -108,7 +125,11 @@ class ConjunctiveQuery(Rule):
                 attr_mapping[var1_root] = var2
 
 
-        q_free = [Variable(attr_mapping[free_var].upper()) for free_var in free_vars if free_var in attr_mapping]
+        q_free = [
+                    Variable(attr_mapping[free_var].upper()) 
+                    for free_var in free_vars 
+                        if free_var in attr_mapping
+                ]
 
         head_atom = Atom(query_name, q_free)
         self.head = head_atom
@@ -119,23 +140,30 @@ class ConjunctiveQuery(Rule):
         for table in atom_names:
             body = []
             index = 0
+            comparators = []
             for attr in schema_json[table]["attributes"]:
-                var_root = attr.lower() 
+                var_root = "{}.{}".format(table, attr).lower() 
                 is_constant = False
                 while var_root != attr_mapping[var_root]:
                     var_root = attr_mapping[var_root]
                     if var_root not in attr_mapping:
                         is_constant = True
                         break
+                if var_root in var_to_display:
+                    if var_root in comparators_dict:
+                        lhs = var_root
+                        for filters in comparators_dict[lhs]:
+                            op, rhs = filters
+                            comp = get_comparator(lhs, op, rhs)
+                            comparators.append(comp)
 
-                if var_root in var_to_display:    
                     var = Variable(var_root.upper(), is_constant)
                 else:
                     var = Variable()
                 body.append(var)                
                 index += 1 
 
-            atom = Atom(table, body, schema_json[table]["key"], schema_json[table]["attributes"])
+            atom = Atom(table, body, schema_json[table]["key"], schema_json[table]["attributes"], negated=False, comparators=comparators)
             q_body.append(atom)
 
         self.body = q_body

@@ -3,7 +3,7 @@
 
 class Comparator:
 
-	def __init__(self, lhs, rhs)
+	def __init__(self, lhs, rhs):
 		self.lhs = lhs
 		self.rhs = rhs
 
@@ -18,7 +18,7 @@ class Equal(Comparator):
 		return NotEqual(self.lhs, self.rhs)
 
 	def __repr__(self):
-		return "{} = {}".format(lhs, rhs)
+		return "{} = {}".format(self.lhs, self.rhs)
 
 
 
@@ -28,7 +28,7 @@ class NotEqual(Comparator):
 		return Equal(self.lhs, self.rhs)
 
 	def __repr__(self):
-		return "{} != {}".format(lhs, rhs)
+		return "{} != {}".format(self.lhs, self.rhs)
 
 
 class LessThan(Comparator):
@@ -37,7 +37,7 @@ class LessThan(Comparator):
 		return GreaterThanEq(self.lhs, self.rhs)
 
 	def __repr__(self):
-		return "{} < {}".format(lhs, rhs)
+		return "{} < {}".format(self.lhs, self.rhs)
 
 
 class GreaterThan(Comparator):
@@ -46,7 +46,7 @@ class GreaterThan(Comparator):
 		return LessThanEq(self.lhs, self.rhs)
 
 	def __repr__(self):
-		return "{} > {}".format(lhs, rhs)
+		return "{} > {}".format(self.lhs, self.rhs)
 
 
 class LessThanEq(Comparator):
@@ -55,7 +55,7 @@ class LessThanEq(Comparator):
 		return GreaterThan(self.lhs, self.rhs)
 
 	def __repr__(self):
-		return "{} <= {}".format(lhs, rhs)
+		return "{} <= {}".format(self.lhs, self.rhs)
 
 
 class GreaterThanEq(Comparator):
@@ -64,7 +64,7 @@ class GreaterThanEq(Comparator):
 		return LessThan(self.lhs, self.rhs)
 
 	def __repr__(self):
-		return "{} >= {}".format(lhs, rhs)
+		return "{} >= {}".format(self.lhs, self.rhs)
 
 
 class Like(Comparator):
@@ -73,7 +73,7 @@ class Like(Comparator):
 		return NotLike(self.lhs, self.rhs)
 
 	def __repr__(self):
-		return "{} LIKE {}".format(lhs, rhs)
+		return "{} LIKE {}".format(self.lhs, self.rhs)
 
 
 class NotLike(Comparator):
@@ -82,7 +82,20 @@ class NotLike(Comparator):
 		return Like(self.lhs, self.rhs)
 
 	def __repr__(self):
-		return "{} NOT LIKE {}".format(lhs, rhs)
+		return "{} NOT LIKE {}".format(self.lhs, self.rhs)
 
 
-
+def get_comparator(lhs, op, rhs):
+	if op == "=":
+		return Equal(lhs, rhs)
+	elif op == "<":
+		return LessThan(lhs, rhs)
+	elif op == ">":
+		return GreaterThan(lhs, rhs)
+	elif op == "<=":
+		return LessThanEq(lhs, rhs)
+	elif op == ">=":
+		return GreaterThanEq(lhs, rhs)
+	elif op == "like":
+		return Like(lhs, rhs)
+	return None

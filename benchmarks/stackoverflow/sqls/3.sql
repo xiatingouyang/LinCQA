@@ -1,3 +1,3 @@
-SELECT DISTINCT U.DisplayName
-FROM Users U, Posts P
-WHERE U.Id = P.OwnerUserId AND P.Tags LIKE "<c++>"
+SELECT DISTINCT Users.DisplayName
+FROM Users, Posts
+WHERE Users.Id = Posts.OwnerUserId AND Posts.Tags LIKE "<c++>"
