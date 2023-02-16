@@ -53,13 +53,14 @@ def main():
 		print("Not enough arguments") 
 
 	schema = Schema(schema_dir_str)
-	cq = ConjunctiveQuery(input_sql_dir_str, schema)
-
-	print("=========== Parsed Conjunctive Query ==========")
+	cq = ConjunctiveQuery()
+	cq.read_from_dir(input_sql_dir_str, schema)
+	
+	print("\n=========== Parsed Conjunctive Query ==========\n")
 	print(cq)
 
 
-	print("=========== Rewriting ==========")
+	print("\n=========== Rewriting ==========\n")
 	if algorithm == "lincqa":
 		rewriter = LinCQARewriter()
 	elif algorithm == "fastfo":
@@ -68,6 +69,8 @@ def main():
 		rewriter = ConQuerRewriter()
 
 	rewriter.rewrite(cq, is_rewrite_as_sql, output_dir)
+
+	print("\n\n")
 	return
 
 

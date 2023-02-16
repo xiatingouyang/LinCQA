@@ -7,7 +7,7 @@ from src.conjunctive_query.Comparator import *
 
 
 def parse(sql):
-
+    sql = sql.replace("distinct", "")
     select_line = sql.split("select")[1]
     from_line = select_line.split("from")[1]
     select_line = select_line.split("from")[0]
@@ -28,12 +28,7 @@ def parse(sql):
     atom_names = from_line.split(",")
     free_vars_temp = select_line.split(",")
 
-    free_vars = []
-    for free_var in free_vars_temp:
-        if "." in free_var:
-            free_vars.append(free_var.split(".")[1])
-        else:
-            free_vars.append(free_var)
+    free_vars = free_vars_temp
 
 
     joining_vars_temp = join_line.split("and")
@@ -51,9 +46,35 @@ def parse(sql):
 
 class ConjunctiveQuery(Rule):
 
-    def __init__(self, input_sql_dir_str, schema_obj):
-
+    def __init__(self, schema_obj=None, head_atom=None, q_body=None):
         self.schema = schema_obj
+        self.head = head_atom
+        self.body = q_body
+
+
+    def is_boolean(self):
+        return len(self.head.variables) == 0
+    
+
+    def is_self_join_free(self):
+        names = []
+        for atom in self.body:
+            if atom.name not in names:
+                names.append(atom.name)
+            else:
+                return False
+        return True
+
+
+
+    def get_atom_by_name(self, atom_name):
+        for atom in self.body:
+            if atom.name == atom_name:
+                return atom 
+        return None
+
+
+    def read_from_dir(self, input_sql_dir_str,schema_obj=None):
         sql_file = open(input_sql_dir_str, "r")
         sql_str = sql_file.read()
         sql_file.close()
@@ -67,11 +88,6 @@ class ConjunctiveQuery(Rule):
 
         atom_names, free_vars, joining_vars = parse(sql_str_lower)
 
-        self.head = None
-        self.body = []
-
-        # print(sql_str_lower)
-        
         schema_json = schema_obj.schema
         attr_mapping = {}
         for table in atom_names:
@@ -130,13 +146,11 @@ class ConjunctiveQuery(Rule):
                     for free_var in free_vars 
                         if free_var in attr_mapping
                 ]
-
         head_atom = Atom(query_name, q_free)
-        self.head = head_atom
 
 
         q_body = []
-
+        dummy_index = 0
         for table in atom_names:
             body = []
             index = 0
@@ -144,11 +158,13 @@ class ConjunctiveQuery(Rule):
             for attr in schema_json[table]["attributes"]:
                 var_root = "{}.{}".format(table, attr).lower() 
                 is_constant = False
+
                 while var_root != attr_mapping[var_root]:
                     var_root = attr_mapping[var_root]
                     if var_root not in attr_mapping:
                         is_constant = True
                         break
+
                 if var_root in var_to_display:
                     if var_root in comparators_dict:
                         lhs = var_root
@@ -159,15 +175,44 @@ class ConjunctiveQuery(Rule):
 
                     var = Variable(var_root.upper(), is_constant)
                 else:
-                    var = Variable()
+                    var = Variable("Z_{}".format(dummy_index))
+                    dummy_index += 1
                 body.append(var)                
                 index += 1 
 
             atom = Atom(table, body, schema_json[table]["key"], schema_json[table]["attributes"], negated=False, comparators=comparators)
             q_body.append(atom)
 
+        self.schema = schema_obj
+        self.head = head_atom
         self.body = q_body
 
+    def booleanize(self):
 
-    
+        old_head_vars = self.head.variables
+        new_body = []
+        new_comparators = []
+        for atom in self.body:
+            new_variables = []
+            for var in atom.variables:
+                if var in old_head_vars:
+                    new_var = var.copy()
+                    new_var.set_is_constant(True)
+                    new_variables.append(new_var)
+                else:
+                    new_variables.append(var)
 
+            new_atom = Atom(
+                    atom.name, 
+                    new_variables, 
+                    pk_positions=atom.pk_positions, 
+                    attributes=atom.attributes, 
+                    negated=atom.negated, 
+                    comparators=new_comparators
+                    )
+
+            new_body.append(new_atom)
+
+        new_head_atom = Atom(self.head.name, [])
+        new_cq = ConjunctiveQuery(self.schema, new_head_atom, new_body)
+        return new_cq

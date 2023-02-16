@@ -1,5 +1,5 @@
 
-# python3 rewriter.py -s benchmarks/tpch/schemas.json -i benchmarks/tpch/sqls/10.sql -algo lincqa
+python3 rewriter.py -s benchmarks/synthetic/schemas.json -i benchmarks/synthetic/sqls/18.sql -algo lincqa
 		
 # for benchmark in synthetic; do
 # 	for qid in {15..21}; do
@@ -19,10 +19,10 @@
 # done
 
 
-for benchmark in stackoverflow; do
-	for qid in {1..5}; do
-		for algo in lincqa; do
-			python3 rewriter.py -s benchmarks/${benchmark}/schemas.json -i benchmarks/${benchmark}/sqls/${qid}.sql -algo ${algo}
-		done
-	done
-done
+# for benchmark in stackoverflow; do
+# 	for qid in {1..5}; do
+# 		for algo in lincqa; do
+# 			python3 rewriter.py -s benchmarks/${benchmark}/schemas.json -i benchmarks/${benchmark}/sqls/${qid}.sql -algo ${algo}
+# 		done
+# 	done
+# done

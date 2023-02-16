@@ -1,3 +1,9 @@
+import sys
+sys.path.append("../../")
+
+from src.attack_graph.AttackGraph import *
+
+
 class FORewriter:
 
 	def __init__(self):
@@ -27,4 +33,11 @@ class FORewriter:
 		return self.is_fo(cq)
 
 	def is_fo(self, cq):
-		return True
+		if not cq.is_self_join_free():
+			print("Currently can only support sjf CQs")
+			return False
+
+		bcq = cq.booleanize()
+		ag = AttackGraph(bcq)
+		ret = ag.is_acyclic()
+		return ret

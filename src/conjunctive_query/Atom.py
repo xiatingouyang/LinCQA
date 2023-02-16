@@ -42,27 +42,34 @@ class Atom:
 
 	def get_variables(self):
 		ret = []
-		for var in variables:
-			if not var.is_constant() and var not in ret:
+		for var in self.variables:
+			if not var.is_constant and var not in ret:
 				ret.append(var)
 		return ret 
 
-	def get_pk_variables(self):
+	def get_pk_variables(self, include_constant = True):
 		ret = []
 		for pk_index in self.pk_positions:
 			var = self.variables[pk_index]
 			if var not in ret:
-				ret.append(var)
+				if include_constant:
+					ret.append(var)
+				else:
+					if not var.is_constant:
+						ret.append(var)
 		return ret
 
-	def get_nonkey_variables(self):
+	def get_nonkey_variables(self, include_constant = True):
 		ret = []
 		arity = len(self.variables)
 		for i in range(arity):
 			if i not in self.pk_positions:
 				var = self.variables[i]
-				if var not in ret:
+				if include_constant:
 					ret.append(var)
+				else:
+					if not var.is_constant:
+						ret.append(var)
 		return ret
 
 
@@ -88,3 +95,10 @@ class Atom:
 
 		return attr_joining_dict
 
+	def get_joining_variables(self, atom):
+		ret = []
+		for vi in self.get_variables():
+			for vj in atom.get_variables():
+				if not vi.is_constant and not vj.is_constant and vi == vj and vi not in ret:
+					ret.append(vi)
+		return ret
