@@ -53,7 +53,7 @@ class ConjunctiveQuery(Rule):
 
 
     def is_boolean(self):
-        return len(self.head.variables) == 0
+        return self.head == None
     
 
     def is_self_join_free(self):
@@ -213,6 +213,6 @@ class ConjunctiveQuery(Rule):
 
             new_body.append(new_atom)
 
-        new_head_atom = Atom(self.head.name, [])
-        new_cq = ConjunctiveQuery(self.schema, new_head_atom, new_body)
+        # new_head_atom = Atom(self.head.name, [])
+        new_cq = ConjunctiveQuery(self.schema, None, new_body)
         return new_cq

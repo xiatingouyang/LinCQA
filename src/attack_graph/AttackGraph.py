@@ -12,13 +12,13 @@ class AttackGraph:
 	def __init__(self, cq):
 
 		self.cq = cq 
-
-		if not cq.is_boolean():
-			print("Attack graph only for BCQs")
-			return
-
 		self.relation_names = [atom.name for atom in cq.body]
 		self.attacks = {}
+		
+		if not cq.is_boolean():
+			print("Attack graph only for BCQs")
+			return None
+
 		closures = {}
 
 		fds = []
@@ -110,7 +110,7 @@ class AttackGraph:
 
 
 
-	def get_unattacked_atom(self, cq):
+	def get_unattacked_atom(self):
 		in_deg = {}
 		for u in self.attacks:
 			in_deg[u] = 0
@@ -119,8 +119,8 @@ class AttackGraph:
 			for v in self.attacks[u]:
 				in_deg[v] += 1
 
-		ret = 0
+		ret = []
 		for u in self.attacks:
 			if in_deg[u] == 0:
-				ret.append(cq.get_atom_by_name(u))
+				ret.append(self.cq.get_atom_by_name(u))
 		return ret
