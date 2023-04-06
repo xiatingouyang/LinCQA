@@ -3,7 +3,7 @@ sys.path.append("../../")
 
 from src.fo_rewriter.FORewriter import *
 from src.conjunctive_query.ConjunctiveQuery import *
-from src.conjunctive_query.JoinTree import *
+from src.join_tree.JoinTree import *
 
 
 class LinCQARewriter(FORewriter):

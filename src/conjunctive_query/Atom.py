@@ -102,3 +102,8 @@ class Atom:
 				if not vi.is_constant and not vj.is_constant and vi == vj and vi not in ret:
 					ret.append(vi)
 		return ret
+
+
+	def is_joining(self, atom):
+		ret = self.get_joining_variables(atom)
+		return len(ret) > 0
