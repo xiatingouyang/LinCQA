@@ -59,6 +59,13 @@ class Atom:
 						ret.append(var)
 		return ret
 
+
+	def get_pk_attributes(self):
+		ret = []
+		for index in self.pk_positions:
+			ret.append(self.attributes[index])
+		return ret
+
 	def get_nonkey_variables(self, include_constant = True):
 		ret = []
 		arity = len(self.variables)
@@ -95,15 +102,47 @@ class Atom:
 
 		return attr_joining_dict
 
-	def get_joining_variables(self, atom):
+	def get_joining_variables(self, atom, skip = []):
 		ret = []
 		for vi in self.get_variables():
 			for vj in atom.get_variables():
-				if not vi.is_constant and not vj.is_constant and vi == vj and vi not in ret:
+				if not vi.is_constant and not vj.is_constant and vi == vj and vi not in ret and vi not in skip:
 					ret.append(vi)
 		return ret
 
 
-	def is_joining(self, atom):
-		ret = self.get_joining_variables(atom)
+
+	def get_joining_clauses(self, atom):
+		arity_1 = self.get_arity()
+		arity_2 = atom.get_arity()
+
+		ret = []
+		for i in range(arity_1):
+			vi = self.variables[i]
+			tablei = self.name
+
+			if vi.is_constant:
+				continue
+			for j in range(arity_2):
+				vj = atom.variables[j]
+				tablej = atom.name
+
+				if vj.is_constant:
+					continue
+
+				if vi == vj:
+					clause = "{}.{} = {}.{}".format(tablei, 
+													self.attributes[i],
+													tablej,
+													atom.attributes[j])
+					ret.append(clause)
+
+		return ret
+
+
+
+
+
+	def is_joining(self, atom, skip = []):
+		ret = self.get_joining_variables(atom, skip)
 		return len(ret) > 0

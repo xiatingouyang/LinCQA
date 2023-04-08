@@ -9,7 +9,7 @@ def intersect(a, b):
 	for x in a:
 		if x in b and x not in ret:
 			ret.append(x)
-	return x
+	return ret
 
 def union(a, b):
 	ret = []

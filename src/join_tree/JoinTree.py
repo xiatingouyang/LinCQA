@@ -19,11 +19,45 @@ def construct_join_tree_from_cq_util(cq, join_tree_adj_list, root_atom_name, par
 	return TreeNode(root_atom, parent, children, cq.schema)
 
 
+def set_free_variables_to_tree_node(tree_node, cq):
+
+	whole_free_variables = cq.get_head_variables()
+	curr_variables = tree_node.get_all_variables()
+	free_variables_req = intersect(whole_free_variables, curr_variables)
+	tree_node.free_variables = free_variables_req
+	for child in tree_node.children:
+		set_free_variables_to_tree_node(child, cq)
+
+
+def set_proj_attributes_to_tree_node(tree_node, cq):
+
+	whole_free_variables = cq.get_head_variables()
+	node_atom = tree_node.atom
+	for i in range(len(node_atom.variables)):
+		var = node_atom.variables[i]
+		if var in whole_free_variables:
+			attr = node_atom.attributes[i]
+			tree_node.proj_attributes.append(attr)
+
+
+	for child in tree_node.children:
+		set_proj_attributes_to_tree_node(child, cq)
+
+
+
+
+def set_parent_node(root_node):
+	for child_node in root_node.children:
+		child_node.parent = root_node
+		set_parent_node(child_node)
+
 
 def construct_join_tree_from_cq(cq, join_tree_adj_list, root_atom_name):
-	return construct_join_tree_from_cq_util(cq, join_tree_adj_list, root_atom_name, None, [])
-	
-
+	root_node = construct_join_tree_from_cq_util(cq, join_tree_adj_list, root_atom_name, None, [])
+	set_free_variables_to_tree_node(root_node, cq)
+	set_proj_attributes_to_tree_node(root_node, cq)
+	set_parent_node(root_node)
+	return root_node
 
 
 def get_a_join_tree_adj_list(cq, ppjt_insisted=False):
@@ -43,7 +77,8 @@ class TreeNode:
 		self.parent = _parent
 		self.children = _children
 		self.schema = schema
-
+		self.free_variables = []
+		self.proj_attributes = []
 
 	def add_child(self, child_node):
 		self.children.append(child_node)
@@ -62,6 +97,76 @@ class TreeNode:
 		for child in self.children:
 			ret += child.get_all_atoms()
 		return ret
+
+
+	def get_all_variables(self):
+		all_atoms = self.get_all_atoms()
+		ret = []
+		for atom in all_atoms:
+			variables = atom.get_variables()
+			for var in variables:
+				if var not in ret:
+					ret.append(var)
+		return ret
+
+
+	def get_bad_key_head_atom(self):
+		atom_name = self.atom.name 
+		head_atom_name = "{}_bad_key".format(atom_name)
+
+		variables = self.atom.get_pk_variables()
+		head_atom_attributes = [self.atom.attributes[i] for i in self.atom.pk_positions]
+
+		for child_node in self.children:
+			child_good_join_atom = child_node.get_good_join_head_atom()
+			for f_var in intersect(child_good_join_atom.variables, child_node.free_variables):
+				if f_var not in variables:
+					variables.append(f_var)
+					# this is hacky... assuming that the proj
+					# attribute is already * encoded * in the 
+					# variable name
+					attr_name = f_var.name.split(".")[1]
+		
+		for attr in self.proj_attributes:
+			if attr not in head_atom_attributes:
+				head_atom_attributes.append(attr)
+
+
+		ret = Atom(head_atom_name, variables)
+		ret.attributes = head_atom_attributes
+		return ret
+
+	def get_good_join_head_atom(self):
+		atom_name = self.atom.name 
+		head_atom_name = "{}_good_join".format(atom_name)
+
+		parent_atom = None
+		if self.parent:
+			parent_atom = self.parent.atom
+
+		variables = []
+		head_atom_attributes = []
+		if parent_atom:
+			variables += self.atom.get_joining_variables(parent_atom)
+
+		for f_var in self.free_variables:
+			if f_var not in variables:
+				variables.append(f_var)
+
+		ret = Atom(head_atom_name, variables)
+		return ret
+
+
+	def get_rooted_head_atom(self):
+		head_atom = Atom("q_{}".format(self.atom.name), self.free_variables)
+		return head_atom
+
+
+	def get_rooted_subquery(self):
+		all_atoms = self.get_all_atoms()
+		head_atom = self.get_rooted_head_atom()
+		cq = ConjunctiveQuery(None, head_atom, all_atoms)
+		return cq
 
 
 	def is_ppjt(self):

@@ -43,6 +43,73 @@ def parse(sql):
 
 
 
+def decompose_query(q):
+    index_to_atom = {}
+
+    graph = {}
+    parent = {}
+
+    free_variables = q.get_head_variables()
+
+    for i in range(len(q.body)):
+        index_to_atom[i] = q.body[i]
+        graph[i] = []
+
+    for i in range(len(q.body)):
+        parent[i] = -1
+        index_to_atom[i] = q.body[i]
+        
+        for j in range(i+1, len(q.body)):
+            if index_to_atom[i].is_joining(index_to_atom[j], q.get_head_variables()):
+                graph[i].append(j)
+                graph[j].append(i)
+    
+    def dfs(u, index):
+        parent[u] = index 
+        for v in graph[u]:
+            if parent[v] < 0:
+                dfs(v, index)
+
+    cnt = 0
+    for i in range(len(q.body)):
+        if parent[i] < 0:
+            dfs(i, cnt)
+        cnt += 1
+
+
+    components = {}
+
+    for i in parent:
+        component_index = parent[i]
+        if component_index not in components:
+            components[component_index] = []
+
+        components[component_index].append(index_to_atom[i])
+
+        
+
+    qs = []
+    index = 1
+    for component_index in components:
+        component = components[component_index]
+
+        all_vars = []
+
+        for atom in component:
+            for var in atom.get_variables():
+                all_vars.append(var.name)
+
+        free_var = []
+        for var in q.get_head_variables():
+            if var.name in all_vars:
+                free_var.append(var)
+
+        head_atom = Atom("q_cc{}".format(index), free_var)
+        query = ConjunctiveQuery(q.schema, head_atom, component.copy())
+        qs.append(query)
+        index += 1
+    return qs
+
 
 class ConjunctiveQuery(Rule):
 
@@ -56,6 +123,12 @@ class ConjunctiveQuery(Rule):
         return self.head == None
     
 
+    def get_head_variables(self):
+        if self.is_boolean():
+            return []
+        else:
+            return self.head.get_variables()
+
     def is_self_join_free(self):
         names = []
         for atom in self.body:
@@ -64,6 +137,16 @@ class ConjunctiveQuery(Rule):
             else:
                 return False
         return True
+
+
+    def get_all_variables(self):
+        ret = []
+        for atom in self.body:
+            variables = atom.get_variables()
+            for var in variables:
+                if var not in ret:
+                    ret.append(var)
+        return ret
 
 
 
