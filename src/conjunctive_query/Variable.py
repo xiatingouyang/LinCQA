@@ -5,7 +5,7 @@ class Variable:
 		self.is_constant = is_constant
 
 	def __eq__(self, var):
-		return self.name == var.name and self.is_constant == var.is_constant
+		return self.name.lower() == var.name.lower() and self.is_constant == var.is_constant
 
 	def __repr__(self):
 		if self.is_constant:

@@ -23,7 +23,11 @@ class LinCQARewriter(FORewriter):
 		return ("TODO lincqa datalog")
 
 
-
+	def is_ground_joining_required(self, tree_node):
+		bad_key_head_atom = tree_node.get_bad_key_head_atom()
+		if len(bad_key_head_atom.variables) > len(tree_node.atom.pk_positions):
+			return True
+		return False		
 
 
 	
@@ -33,7 +37,18 @@ class LinCQARewriter(FORewriter):
 		bad_key_head_atom = tree_node.get_bad_key_head_atom()
 		bad_key_view_name = bad_key_head_atom.name
 
+		ground_joining = self.is_ground_joining_required(tree_node)
+
+
 		
+		repeated_var_pruning_sql = """
+SELECT table.pk1, table.pk2, ..., table.pkn, C.free_1, C.free_2
+FROM table, C
+WHERE table.{} = C.{} AND ...
+AND (table.ai <> table.aj)
+			"""
+
+
 		# repeated var pruning
 		repeated_var_pruning_sql = "repeated var"
 		return repeated_var_pruning_sql
@@ -107,16 +122,17 @@ class LinCQARewriter(FORewriter):
 			table_name = atom.name
 			pk_attributes = atom.get_pk_attributes()
 			for attr in pk_attributes:
-				proj_attr = "{}.{}".format(table_name, attr)
+				proj_attr = "{}.{}".format(table_name, attr).lower()
 				ground_variables.append(Variable(proj_attr))
 				atom_attributes.append(attr)
 				proj_attr_list.append(proj_attr)
 
 		for var in cq.get_head_variables():
-			proj_attr_list.append(var.name)
-			ground_variables.append(Variable(var.name))
-			atom_attributes.append(var.name.split(".")[1])
-				
+			if var.name.lower() not in proj_attr_list:
+				proj_attr_list.append(var.name)
+				ground_variables.append(Variable(var.name))
+				atom_attributes.append(var.name.split(".")[1])
+					
 		
 		proj_attr_str = ", ".join(proj_attr_list)
 
@@ -186,7 +202,7 @@ good join
 			sqls += self.get_lincqa_sql_from_ppjt(child_node, cq, ground_atom)
 
 		curr_sqls = self.get_self_pruning_sqls(tree_node, cq, ground_atom)
-		print(curr_sqls)
+
 		pair_pruning_sql = self.get_pair_pruning_sql(tree_node, cq, ground_atom)
 		if pair_pruning_sql:
 			curr_sqls.append(pair_pruning_sql)
@@ -217,14 +233,13 @@ good join
 		
 		cq_components = decompose_query(cq)
 		
-
 		ret_sqls = []
+		ground_sqls, ground_atom = self.get_ground_sql(cq)
+		ret_sqls += ground_sqls
+			
 		for cq_cc in cq_components:
-			join_tree_adj_list, root_atom_name = get_a_join_tree_adj_list(cq_cc, ppjt_insisted = False)
-			join_tree_root = construct_join_tree_from_cq(cq_cc, join_tree_adj_list, root_atom_name)
 
-			ground_sqls, ground_atom = self.get_ground_sql(cq_cc)
-			ret_sqls += ground_sqls
+			join_tree_root = construct_join_tree_from_cq(cq_cc, ppjt_insisted = True)
 			ret_sqls += self.get_lincqa_sql_from_ppjt(join_tree_root, cq_cc, ground_atom)
 		
 		ret_sqls += self.get_main_sql(cq)

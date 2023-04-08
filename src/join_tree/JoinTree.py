@@ -6,7 +6,7 @@ from src.conjunctive_query.Variable import *
 from src.conjunctive_query.Atom import *
 from src.conjunctive_query.Comparator import *
 from src.attack_graph.AttackGraph import *
-
+from src.join_tree.JoinTreeEnumeration import *
 
 def construct_join_tree_from_cq_util(cq, join_tree_adj_list, root_atom_name, parent, seen):
 	root_atom = cq.get_atom_by_name(root_atom_name)
@@ -52,21 +52,26 @@ def set_parent_node(root_node):
 		set_parent_node(child_node)
 
 
-def construct_join_tree_from_cq(cq, join_tree_adj_list, root_atom_name):
-	root_node = construct_join_tree_from_cq_util(cq, join_tree_adj_list, root_atom_name, None, [])
-	set_free_variables_to_tree_node(root_node, cq)
-	set_proj_attributes_to_tree_node(root_node, cq)
-	set_parent_node(root_node)
-	return root_node
 
+def construct_join_tree_from_cq(cq, ppjt_insisted = False):
 
-def get_a_join_tree_adj_list(cq, ppjt_insisted=False):
+	all_join_tree_adj_lists = get_all_join_tree_adj_lists(cq)
+	if len(all_join_tree_adj_lists) == 0:
+		return None
 
-	join_tree_adj_list = {"r_1" : ["r_2"], "r_2" : ["r_1", "r_7"], "r_7" : ["r_2"]}
-	root_atom_name = "r_1"	
-	return join_tree_adj_list, root_atom_name
+	best_root_node = None
 
-
+	for join_tree_adj_list in all_join_tree_adj_lists:
+		for root_atom_name in join_tree_adj_list:
+			root_node = construct_join_tree_from_cq_util(cq, join_tree_adj_list, root_atom_name, None, [])
+			set_free_variables_to_tree_node(root_node, cq)
+			set_proj_attributes_to_tree_node(root_node, cq)
+			set_parent_node(root_node)
+			if (not ppjt_insisted) or (ppjt_insisted and root_node.is_ppjt()):
+				if root_node.is_better_than(best_root_node):
+					best_root_node = root_node
+		
+	return best_root_node
 
 
 
@@ -83,6 +88,23 @@ class TreeNode:
 	def add_child(self, child_node):
 		self.children.append(child_node)
 		child_node.parent = self
+
+
+
+	def get_height(self):
+		if len(self.children) == 0:
+			return 0
+		else:
+			heights = [child.get_height() for child in self.children]
+			return max(heights) + 1
+
+
+
+	def is_better_than(self, tree_node):
+		if not tree_node:
+			return True
+
+		return self.get_height() < tree_node.get_height()
 
 
 	def __repr__(self):		
