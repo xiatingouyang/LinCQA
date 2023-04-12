@@ -44,12 +44,12 @@ class LinCQARewriter(FORewriter):
 			join_clause = "{}.{} = C.{}".format(tree_node.atom.name, attr, attr)
 			sql_where_list.append(join_clause)
 			select_attr = "{}.{}".format(tree_node.atom.name, attr)
-			if select_attr not in sql_select_list:
+			if attr not in tree_node.atom.get_pk_attributes() and select_attr not in sql_select_list:
 				sql_select_list.append(select_attr)
 
 		return sql_select_list, sql_from_str, sql_where_list
 
-	
+
 	def get_self_pruning_atom_filter_sql(self, tree_node, cq):
 		atom = tree_node.atom
 		n = len(atom.variables)
@@ -92,8 +92,7 @@ class LinCQARewriter(FORewriter):
 		
 		sql_atom_filter_clause = " OR ".join(sql_total_list)
 
-		atom_filter_sql = """
---- atom filter for {}
+		atom_filter_sql = """--- atom filter for {}
 
 SELECT {}
 FROM {}
@@ -125,9 +124,7 @@ WHERE {}
 
 		sql_select_with_proj_str = ", ".join(sql_select_list + sql_select_proj_list)
 
-		free_var_pruning_sql = """
---- free var for {}
-
+		free_var_pruning_sql = """--- free var for {}
 SELECT {}
 FROM (
 	SELECT DISTINCT {}
@@ -223,13 +220,14 @@ HAVING COUNT(*) > 1
 		left_outer_join_clause_str = "\n".join(left_outer_join_clauses)
 		is_null_clause_str = " OR ".join(is_null_clauses)
 
-		pair_pruning_sql = """
+		pair_pruning_sql = """ -- pair pruning for {}
+
 SELECT {} 
 FROM {} 
 {}
 WHERE ({})
 
-""".format(sql_select_str, sql_from_str, left_outer_join_clause_str, is_null_clause_str)
+""".format(tree_node.atom.name, sql_select_str, sql_from_str, left_outer_join_clause_str, is_null_clause_str)
 
 
 		return pair_pruning_sql
@@ -239,8 +237,6 @@ WHERE ({})
 		if cq.is_boolean():
 			return [], None
 		
-
-
 		# produce the proj_attr_str
 		ground_variables = []
 		atom_attributes = []
@@ -286,8 +282,7 @@ WHERE ({})
 		where_clause_str = " AND ".join(where_clause_list)
 
 
-		sql = """
-CANDIDATE AS (
+		sql = """CANDIDATE AS (
 
 SELECT {}
 FROM {}
@@ -299,7 +294,7 @@ WHERE {}
 		ground_atom = Atom("ground", ground_variables)
 		ground_atom.attributes = atom_attributes
 
-		return [sql], ground_atom
+		return sql, ground_atom
 
 	
 	def get_good_join_sql(self, tree_node, cq, ground_atom, has_self_pruning, has_pair_pruning):
@@ -317,7 +312,12 @@ WHERE {}
 		for attr in sql_select_list_candidate:
 			if attr not in good_join_select_list:
 				good_join_select_list.append(attr)
-		good_join_select_str = ", ".join(good_join_select_list)
+
+		good_join_select_str = "DISTINCT 1"
+		if good_join_select_list:
+			good_join_select_str = ", ".join(good_join_select_list)
+
+
 		join_with_candidate_clauses_str = ""
 		if sql_where_list:
 			join_with_candidate_clauses = " AND ".join(sql_where_list)
@@ -380,8 +380,7 @@ WHERE {}
 		
 		
 
-		sql = """
-SELECT {}
+		sql = """SELECT {}
 FROM {}
 {}{}
 """.format(good_join_select_str, 
@@ -394,8 +393,63 @@ FROM {}
 
 
 
-	def get_main_sql(self, bcq):
-		sql = "get main select"
+	def get_main_sql(self, cq, roots):
+
+		
+		select_clause_list = []
+		from_clause_list = []
+		where_clause_list = []
+		
+
+
+		for var in cq.head.variables:
+			joining_roots = []
+			for root_node in roots:
+				if var in root_node.get_good_join_head_atom().variables:
+					i = root_node.get_good_join_head_atom().variables.index(var)
+					joining_roots.append((root_node, i))
+
+			n = len(joining_roots)
+			added_select = False
+			for i in range(n):
+				root_i, ii = joining_roots[i]
+				head_i = root_i.get_good_join_head_atom()
+				for j in range(i+1, n):
+					root_j, jj = joining_roots[j]
+					head_j = root_j.get_good_join_head_atom()
+					where_clause = "{}.{} = {}.{}".format(head_i.name, 
+											head_i.variables[ii], 
+											head_j.name,
+											head_j.variables[jj])
+					where_clause_list.append(where_clause)
+
+			
+				if not added_select:
+					select_clause_list.append("{}.{}".format(head_i.name, head_i.attributes[ii]))
+					added_select = True
+
+		for root_node in roots:
+			from_clause_list.append(root_node.get_good_join_head_atom().name)
+			
+		select_clause_str = "1"
+		if select_clause_list:
+			select_clause_str = ", ".join(select_clause_list)
+			
+		from_clause_str = ", ".join(from_clause_list)
+		where_clause_str = " AND ".join(where_clause_list)
+
+		if where_clause_list:
+			where_clause_str = "WHERE {}".format(where_clause_list)
+
+		sql = """
+--- main --
+
+SELECT DISTINCT {}
+FROM {}
+{}
+""".format(select_clause_str, from_clause_str, where_clause_str)
+
+
 		return [sql]
 
 
@@ -423,8 +477,7 @@ FROM {}
 			has_self_pruning = True
 			self_pruning_sqls_unioned = "\n\nUNION ALL\n\n".join(self_pruning_sqls)
 
-			sql = """
-{}_self AS (
+			sql = """{}_self AS (
 {}
 )
 """.format(bad_key_view_name, self_pruning_sqls_unioned)
@@ -439,8 +492,7 @@ FROM {}
 		pair_pruning_sql = self.get_pair_pruning_sql(tree_node, cq, ground_atom)
 		if pair_pruning_sql:
 			has_pair_pruning = True
-			sql = """
-{}_pair AS (
+			sql = """{}_pair AS (
 {}
 )
 """.format(bad_key_view_name, pair_pruning_sql)		
@@ -449,11 +501,10 @@ FROM {}
 
 		
 		good_join_sql = self.get_good_join_sql(tree_node, cq, ground_atom, has_self_pruning, has_pair_pruning)
-		sql = """
-{} AS (
+		sql = """{} AS (
 {}
 )
-""".format(good_join_view_name ,good_join_sql)
+""".format(good_join_view_name, good_join_sql)
 		sqls.append(sql)
 		
 		return sqls
@@ -466,16 +517,24 @@ FROM {}
 		cq_components = decompose_query(cq)
 		
 		ret_sqls = []
-		ground_sqls, ground_atom = self.get_ground_sql(cq)
-		ret_sqls += ground_sqls
-			
+		ground_sql, ground_atom = self.get_ground_sql(cq)
+		
+		roots = []
 		for cq_cc in cq_components:
 
 			join_tree_root = construct_join_tree_from_cq(cq_cc, ppjt_insisted = True)
+			roots.append(join_tree_root)
 			ret_sqls += self.get_lincqa_sql_from_ppjt(join_tree_root, cq_cc, ground_atom)
 		
-		ret_sqls += self.get_main_sql(cq)
-		ret_sql = "\n\n".join(ret_sqls)
+		ret_sqls += self.get_main_sql(cq, roots)
+
+		for sql in ret_sqls:
+			if "CANDIDATE C" in sql:
+				ret_sqls.insert(0, ground_sql)
+				break
+
+
+		ret_sql = "WITH {}".format("\n\n".join(ret_sqls))
 
 		return ret_sql
 
