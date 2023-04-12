@@ -1,3 +1,3 @@
-SELECT DISTINCT P.id, P.title 
-FROM Posts P, Votes V
-WHERE P.Id = V.PostId AND P.OwnerUserId = V.UserId AND BountyAmount > 100
+SELECT DISTINCT Posts.id, Posts.title 
+FROM Posts, Votes
+WHERE Posts.Id = Votes.PostId AND Posts.OwnerUserId = Votes.UserId AND Votes.BountyAmount > 100
