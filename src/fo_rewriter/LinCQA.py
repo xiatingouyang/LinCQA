@@ -115,7 +115,7 @@ WHERE {}
 
 		for i in range(len(atom.variables)):
 			var = atom.variables[i]
-			if not var.is_constant and var in cq.head.variables:
+			if var not in atom.get_pk_variables() and not var.is_constant and var in cq.head.variables:
 				attr = "{}.{}".format(atom.name, atom.attributes[i])
 				sql_select_proj_list.append(attr)
 
@@ -334,8 +334,7 @@ WHERE {}
 
 			self_pruning_join_conditions_str = " AND ".join(self_pruning_join_conditions_list)
 
-			not_exist_self_sql = """
-NOT EXISTS (
+			not_exist_self_sql = """NOT EXISTS (
 	SELECT *
 	FROM {}_single
 	WHERE {}
@@ -359,8 +358,7 @@ NOT EXISTS (
 
 			pair_pruning_join_conditions_str = " AND ".join(pair_pruning_join_conditions_list)
 
-			not_exist_pair_sql = """
-NOT EXISTS (
+			not_exist_pair_sql = """NOT EXISTS (
 	SELECT * 
 	FROM {}_pair
 	WHERE {}
@@ -373,8 +371,7 @@ NOT EXISTS (
 		not_exist_sql_where_str = ""
 		if not_exist_sqls:
 			not_exist_where_clause = "\nAND\n".join(not_exist_sqls)
-			not_exist_sql_where_str = """
-WHERE {}
+			not_exist_sql_where_str = """WHERE {}
 """.format(not_exist_where_clause)
 
 		
