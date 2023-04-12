@@ -1,0 +1,1 @@
+select r.A3, s.B5 from r, s where r.A4 = s.B1 and r.A3 LIKE "c++" and r.A6 < 110 and r.A2 = r.A5 and s.B3 = 12 and s.B4 <> 9

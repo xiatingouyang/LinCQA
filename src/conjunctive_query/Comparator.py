@@ -28,7 +28,7 @@ class NotEqual(Comparator):
 		return Equal(self.lhs, self.rhs)
 
 	def __repr__(self):
-		return "{} != {}".format(self.lhs, self.rhs)
+		return "{} <> {}".format(self.lhs, self.rhs)
 
 
 class LessThan(Comparator):
@@ -88,6 +88,8 @@ class NotLike(Comparator):
 def get_comparator(lhs, op, rhs):
 	if op == "=":
 		return Equal(lhs, rhs)
+	elif op == "<>":
+		return NotEqual(lhs, rhs)
 	elif op == "<":
 		return LessThan(lhs, rhs)
 	elif op == ">":

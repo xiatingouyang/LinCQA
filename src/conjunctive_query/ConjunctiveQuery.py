@@ -34,7 +34,7 @@ def parse(sql):
     joining_vars_temp = join_line.split("and")
     joining_vars = []
     for jv in joining_vars_temp:
-        if "=" in jv or ">" in jv or "<" in jv or "<=" in jv or ">=" in jv:
+        if "=" in jv or ">" in jv or "<" in jv or "<=" in jv or ">=" in jv or "<>" in jv:
             joining_vars.append(jv.replace(" ", ""))
         elif "like" in jv:
             joining_vars.append(jv)
@@ -186,7 +186,7 @@ class ConjunctiveQuery(Rule):
 
         for joining_var in joining_vars:
 
-            operators = ["=", "<", ">", "<=", ">=", "like"]
+            operators = ["<=", ">=", "=", "<", ">", "like", "<>"]
             operator = None
             for op in operators:
                 if op in joining_var:

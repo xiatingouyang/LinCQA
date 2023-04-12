@@ -10,7 +10,7 @@ from src.util.util import *
 class LinCQARewriter(FORewriter):
 
 	def __init__(self):
-		print("initialized LinCQA rewriter")
+		pass
 
 
 	def is_rewritable(self, cq):
@@ -29,38 +29,120 @@ class LinCQARewriter(FORewriter):
 			return True
 		return False		
 
+	def get_ground_joining_sql_components(self, tree_node, ground_atom):
+		bad_key_head_atom = tree_node.get_bad_key_head_atom()
+
+
+		sql_select_list = ["{}.{}".format(tree_node.atom.name, attr) for attr in tree_node.atom.get_pk_attributes()]
+		sql_from_str = tree_node.atom.name
+		sql_where_list = []
+		if len(bad_key_head_atom.variables) == len(tree_node.atom.pk_positions):
+			return sql_select_list, sql_from_str, sql_where_list
+
+		sql_from_str = "{}, CANDIDATE C".format(tree_node.atom.name)
+		for attr in bad_key_head_atom.attributes:
+			join_clause = "{}.{} = C.{}".format(tree_node.atom.name, attr, attr)
+			sql_where_list.append(join_clause)
+		# 	print(tree_node.atom)
+		# 	print(attr)
+		# input()
+
+		return sql_select_list, sql_from_str, sql_where_list
 
 	
 	def get_self_pruning_repeated_var_sql(self, tree_node, cq, ground_atom):
 		atom = tree_node.atom
+		n = len(atom.variables)
+		repeated_var_pruning_sql = ""
+
+		self_joining_repeated_pruning_clauses = []
+		for i in range(n):
+			vi = atom.variables[i]
+			if vi.is_constant:
+				continue
+			for j in range(i+1, n):
+				vj = atom.variables[j]
+				if vj.is_constant:
+					continue
+
+				if vi == vj:
+					clause = "{}.{} <> {}.{}".format(atom.name, atom.attributes[i], atom.name, atom.attributes[j])
+					self_joining_repeated_pruning_clauses.append(clause)
+
+		if len(self_joining_repeated_pruning_clauses) == 0:
+			return repeated_var_pruning_sql
+
 
 		bad_key_head_atom = tree_node.get_bad_key_head_atom()
 		bad_key_view_name = bad_key_head_atom.name
 
-		ground_joining = self.is_ground_joining_required(tree_node)
-
-
+		sql_select_list, sql_from_str, sql_where_list = self.get_ground_joining_sql_components(tree_node, ground_atom)
 		
-		repeated_var_pruning_sql = """
-SELECT table.pk1, table.pk2, ..., table.pkn, C.free_1, C.free_2
-FROM table, C
-WHERE table.{} = C.{} AND ...
-AND (table.ai <> table.aj)
-			"""
+		sql_select_str = ", ".join(sql_select_list)
+		sql_where_str = " AND ".join(sql_where_list)
 
+		sql_repeated_clause = " OR ".join(self_joining_repeated_pruning_clauses)
 
-		# repeated var pruning
-		repeated_var_pruning_sql = "repeated var"
+		if sql_where_str:
+			repeated_var_pruning_sql = """
+--- repeated var for {}
+
+SELECT {}
+FROM {}
+WHERE ({}) AND ({})
+				""".format(atom.name, sql_select_str, sql_from_str, sql_where_str, sql_repeated_clause)
+
+		else:
+			repeated_var_pruning_sql = """
+--- repeated var for {}
+
+SELECT {}
+FROM {}
+WHERE {}
+				""".format(atom.name, sql_select_str, sql_from_str, sql_repeated_clause)
+
 		return repeated_var_pruning_sql
 
 	def get_self_pruning_constant_sql(self, tree_node, cq, ground_atom):
 		atom = tree_node.atom
+		constant_pruning_sql = ""
+
+		if len(atom.comparators) == 0:
+			return constant_pruning_sql
+
+		sql_constant_clause_list = []
+		for comp in atom.comparators:
+			neg_com = comp.negate()
+			sql_constant_clause_list.append(neg_com.__repr__())
+
+		
 		bad_key_head_atom = tree_node.get_bad_key_head_atom()
 		bad_key_view_name = bad_key_head_atom.name
 
+		sql_select_list, sql_from_str, sql_where_list = self.get_ground_joining_sql_components(tree_node, ground_atom)
+		
+		sql_select_str = ", ".join(sql_select_list)
+		sql_where_str = " AND ".join(sql_where_list)
 
-		# constant sql
-		constant_pruning_sql = "constant"
+		sql_constant_clause = " OR ".join(sql_constant_clause_list)
+
+		if sql_where_str:
+			constant_pruning_sql = """
+--- constant for {}
+
+SELECT {}
+FROM {}
+WHERE ({}) AND ({})
+				""".format(atom.name, sql_select_str, sql_from_str, sql_where_str, sql_constant_clause)
+
+		else:
+			constant_pruning_sql = """
+--- constant for {}
+
+SELECT {}
+FROM {}
+WHERE {}
+				""".format(atom.name, sql_select_str, sql_from_str, sql_constant_clause)
 		return constant_pruning_sql
 
 
