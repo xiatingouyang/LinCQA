@@ -168,14 +168,24 @@ class TreeNode:
 
 		variables = []
 		head_atom_attributes = []
-		if parent_atom:
-			variables += self.atom.get_joining_variables(parent_atom)
 
+		if parent_atom:
+			for i in range(len(self.atom.variables)):
+				var = self.atom.variables[i]
+				if var.is_constant:
+					continue
+				if var in parent_atom.variables:
+					variables.append(var)
+					head_atom_attributes.append(self.atom.attributes[i])
+
+		
 		for f_var in self.free_variables:
 			if f_var not in variables:
 				variables.append(f_var)
+				head_atom_attributes.append(f_var.name.split(".")[1])
 
 		ret = Atom(head_atom_name, variables)
+		ret.attributes = head_atom_attributes
 		return ret
 
 

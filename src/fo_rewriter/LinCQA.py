@@ -33,7 +33,7 @@ class LinCQARewriter(FORewriter):
 		bad_key_head_atom = tree_node.get_bad_key_head_atom()
 
 
-		sql_select_list = ["{}.{}".format(tree_node.atom.name, attr) for attr in tree_node.atom.get_pk_attributes()]
+		sql_select_list = []
 		sql_from_str = tree_node.atom.name
 		sql_where_list = []
 		if len(bad_key_head_atom.variables) == len(tree_node.atom.pk_positions):
@@ -164,8 +164,14 @@ HAVING COUNT(*) > 1
 		if len(tree_node.children) == 0:
 			return pair_pruning_sql
 
+		
+		sql_select_list = ["{}.{}".format(tree_node.atom.name, attr) for attr in tree_node.atom.get_pk_attributes()]
 		ret_tuple = self.get_ground_joining_sql_components(tree_node, ground_atom)
-		sql_select_list, sql_from_str, sql_where_list = ret_tuple
+		sql_select_list_candidate, sql_from_str, sql_where_list = ret_tuple
+
+		for attr in sql_select_list_candidate:
+			if attr not in sql_select_list:
+				sql_select_list.append(attr)
 
 		sql_select_str = ", ".join(sql_select_list)
 		
@@ -301,28 +307,89 @@ WHERE {}
 		good_join_head_atom = tree_node.get_good_join_head_atom()
 		good_join_view_name = good_join_head_atom.name
 		
+		bad_key_head_atom = tree_node.get_bad_key_head_atom()
+		bad_key_view_name = bad_key_head_atom.name
+		
+		ret_tuple = self.get_ground_joining_sql_components(tree_node, ground_atom)
+		sql_select_list_candidate, sql_from_str, sql_where_list = ret_tuple
 
-		sql = """
-SELECT {}
-FROM {}
-WHERE NOT EXISTS (
+		good_join_select_list = ["{}.{}".format(atom.name, attr) for attr in good_join_head_atom.attributes]
+		for attr in sql_select_list_candidate:
+			if attr not in good_join_select_list:
+				good_join_select_list.append(attr)
+		good_join_select_str = ", ".join(good_join_select_list)
+		join_with_candidate_clauses_str = ""
+		if sql_where_list:
+			join_with_candidate_clauses = " AND ".join(sql_where_list)
+			join_with_candidate_clauses_str = "JOIN CANDIDATE C ON ({})\n".format(join_with_candidate_clauses)
+		
+
+		not_exist_sqls = []
+
+		if has_self_pruning:
+
+			self_pruning_join_conditions_list = []
+			for attr in atom.get_pk_attributes():
+				self_pruning_join_conditions_list.append("{}.{} = {}_single.{}".format(atom.name, attr, bad_key_view_name, attr))
+
+			self_pruning_join_conditions_str = " AND ".join(self_pruning_join_conditions_list)
+
+			not_exist_self_sql = """
+NOT EXISTS (
 	SELECT *
 	FROM {}_single
 	WHERE {}
 )
-AND NOT EXISTS (
+			""".format(bad_key_view_name, self_pruning_join_conditions_str)
+			not_exist_sqls.append(not_exist_self_sql)
+
+
+
+		if has_pair_pruning:
+
+			pair_pruning_join_conditions_list = []
+			for attr in atom.get_pk_attributes():
+				pair_pruning_join_conditions_list.append("{}.{} = {}_pair.{}".format(atom.name, attr, bad_key_view_name, attr))
+
+			for attr in tree_node.proj_attributes:
+				if attr not in atom.get_pk_attributes():
+					pair_pruning_join_conditions_list.append("C.{} = {}_pair.{}".format(attr, bad_key_view_name, attr))
+
+				
+
+			pair_pruning_join_conditions_str = " AND ".join(pair_pruning_join_conditions_list)
+
+			not_exist_pair_sql = """
+NOT EXISTS (
 	SELECT * 
 	FROM {}_pair
 	WHERE {}
 )
-"""
+			""".format(bad_key_view_name, pair_pruning_join_conditions_str)
+			not_exist_sqls.append(not_exist_pair_sql)
 
+
+
+		not_exist_sql_where_str = ""
+		if not_exist_sqls:
+			not_exist_where_clause = "\nAND\n".join(not_exist_sqls)
+			not_exist_sql_where_str = """
+WHERE {}
+""".format(not_exist_where_clause)
+
+		
+		
 
 		sql = """
-{} AS (
-good join
-)
-		""".format(good_join_view_name)
+SELECT {}
+FROM {}
+{}{}
+""".format(good_join_select_str, 
+			atom.name, 
+			join_with_candidate_clauses_str,
+			not_exist_sql_where_str)
+		
+
 		return sql
 
 
@@ -338,6 +405,9 @@ good join
 		atom = tree_node.atom
 		bad_key_head_atom = tree_node.get_bad_key_head_atom()
 		bad_key_view_name = bad_key_head_atom.name
+		
+		good_join_head_atom = tree_node.get_good_join_head_atom()
+		good_join_view_name = good_join_head_atom.name
 		
 		sqls = []
 		for child_node in tree_node.children:
@@ -379,7 +449,12 @@ good join
 
 		
 		good_join_sql = self.get_good_join_sql(tree_node, cq, ground_atom, has_self_pruning, has_pair_pruning)
-		sqls.append(good_join_sql)
+		sql = """
+{} AS (
+{}
+)
+""".format(good_join_view_name ,good_join_sql)
+		sqls.append(sql)
 		
 		return sqls
 
