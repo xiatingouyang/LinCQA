@@ -1,7 +1,6 @@
-import sys
+import sys, json
 
 from src.conjunctive_query.ConjunctiveQuery import *
-from src.conjunctive_query.Schema import *
 from src.fo_rewriter.FORewriter import *
 from src.fo_rewriter.LinCQA import *
 from src.fo_rewriter.ConQuer import *
@@ -52,7 +51,9 @@ def main():
 	if error_found or not schema_dir_str or not input_sql_dir_str or not algorithm:
 		print("Not enough arguments") 
 
-	schema = Schema(schema_dir_str)
+	file = open(schema_dir_str)
+	schema = json.load(file)
+
 	cq = ConjunctiveQuery()
 	cq.read_from_dir(input_sql_dir_str, schema)
 	

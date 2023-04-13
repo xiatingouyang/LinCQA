@@ -157,15 +157,15 @@ class ConjunctiveQuery(Rule):
         return None
 
 
-    def read_from_dir(self, input_sql_dir_str,schema_obj=None):
+    def read_from_dir(self, input_sql_dir_str,schema_json):
         sql_file = open(input_sql_dir_str, "r")
         sql_str = sql_file.read()
         sql_file.close()
 
-        cq = self.read_from_str(sql_str, schema_obj)
+        cq = self.read_from_str(sql_str, schema_json)
         return cq
 
-    def read_from_str(self, sql_str,schema_obj=None):
+    def read_from_str(self, sql_str,schema_json):
 
         query_name = "Q"
         # uncomment below for Q{i} for each {i}.sql
@@ -175,7 +175,6 @@ class ConjunctiveQuery(Rule):
 
         atom_names, free_vars, joining_vars = parse(sql_str_lower)
 
-        schema_json = schema_obj.schema
         attr_mapping = {}
         for table in atom_names:
             for attr in schema_json[table]["attributes"]:
@@ -270,7 +269,7 @@ class ConjunctiveQuery(Rule):
             atom = Atom(table, body, schema_json[table]["key"], schema_json[table]["attributes"], negated=False, comparators=comparators)
             q_body.append(atom)
 
-        self.schema = schema_obj
+        self.schema = schema_json
         self.head = head_atom
         self.body = q_body
 
