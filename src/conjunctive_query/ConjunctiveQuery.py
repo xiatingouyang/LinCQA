@@ -162,6 +162,10 @@ class ConjunctiveQuery(Rule):
         sql_str = sql_file.read()
         sql_file.close()
 
+        cq = self.read_from_str(sql_str, schema_obj)
+        return cq
+
+    def read_from_str(self, sql_str,schema_obj=None):
 
         query_name = "Q"
         # uncomment below for Q{i} for each {i}.sql
